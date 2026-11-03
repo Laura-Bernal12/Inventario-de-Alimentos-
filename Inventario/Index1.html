@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario Escolar - Reportes de Salidas</title>
+  <link rel="stylesheet" href="Estilos1.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    .dashboard-container,
+    .sistema,
+    .main-content,
+    .contenido {
+      min-width: 0;
+    }
+
+    .table-section,
+    .table-card,
+    .table-wrapper {
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    #salidasTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #salidasTable th,
+    #salidasTable td {
+      padding: 9px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .hidden { display: none !important; }
+
+    .fondo-menu {
+      display: none;
+    }
+
+    .fondo-menu.fondo-visible {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .5);
+      z-index: 999;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, .55);
+    }
+
+    .modal-overlay.hidden { display: none !important; }
+
+    @media (max-width: 768px) {
+      html, body {
+        width: 100%;
+        margin: 0;
+        overflow-x: hidden;
+      }
+
+      .dashboard-container,
+      .sistema {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidebar,
+      .menu-lateral {
+        position: fixed !important;
+        top: 0 !important;
+        left: -280px !important;
+        width: 260px !important;
+        height: 100vh !important;
+        z-index: 1000 !important;
+        overflow-y: auto;
+        transition: left .3s ease-in-out !important;
+      }
+
+      .sidebar.menu-abierto,
+      .menu-lateral.menu-abierto {
+        left: 0 !important;
+      }
+
+      .main-content,
+      .contenido {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 12px !important;
+      }
+
+      .top-header,
+      .cabecera {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .charts-section {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .chart-container {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .table-card {
+        width: 100%;
+        padding: 10px;
+      }
+
+      .table-header {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .filter-box {
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .filter-box input {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      #btnHamburguesa {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .account-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .account-item-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .account-item-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #e2e8f0;
+      flex-shrink: 0;
+    }
+
+    .account-item-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .account-item-info { flex: 1; min-width: 0; }
+    .account-name, .account-role { margin: 0; overflow-wrap: anywhere; }
+    .account-role { color: #64748b; font-size: 12px; }
+    .active-check { color: #16a34a; font-weight: bold; }
+
+    /* =====================================================
+       HAMBURGUESA MORADA (igual a la del Catálogo)
+       Reemplaza al botón y al menú lateral anteriores.
+       El resto de la página no se toca.
+    ===================================================== */
+    #btnHamburguesa,
+    .fondo-menu,
+    .sidebar,
+    .menu-lateral { display: none !important; }
+
+    .main-content,
+    .contenido { margin-left: 0 !important; width: 100% !important; }
+
+    .hamb-btn {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 8px;
+      background: #f3e8ff;
+      color: #7e22ce;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .hamb-btn:hover { background: #e9d5ff; }
+
+    .hamb-fondo {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      z-index: 9998;
+    }
+
+    .hamb-fondo.visible { display: block; }
+
+    #menuInventario {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: min(320px, 86vw);
+      height: 100dvh;
+      background: #fff;
+      overflow-y: auto;
+      border-radius: 0 14px 14px 0;
+      z-index: 9999;
+      box-shadow: 8px 0 28px rgba(0, 0, 0, .14);
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      transform: translateX(-105%);
+      visibility: hidden;
+      transition: transform .25s ease, visibility .25s;
+    }
+
+    #menuInventario.abierto { transform: translateX(0); visibility: visible; }
+
+    .hamb-cab {
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .hamb-logo-grupo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+    .hamb-logo {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hamb-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .hamb-titulo { margin: 0; font-size: 16px; font-weight: 700; color: #1f2937; }
+    .hamb-sub { margin: 0; font-size: 12px; color: #6b7280; }
+
+    .hamb-cerrar {
+      min-width: 48px;
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      background: #f3f4f6;
+      font-size: 30px;
+      line-height: 1;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .hamb-cerrar:hover { background: #e5e7eb; }
+
+    .hamb-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 54px;
+      padding: 16px 20px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #4b5563;
+      font-family: inherit;
+      font-size: 16px;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+
+    .hamb-item:hover { background: #f3f4f6; }
+    .hamb-item.activo { background: #f3e8ff; color: #7e22ce; font-weight: 600; }
+    .hamb-sesion { border-top: 1px solid #e5e7eb; }
+    .hamb-sesion .hamb-item:hover { background: #fef2f2; color: #dc2626; }
+
+    /* NOTIFICACIONES (campana) */
+    .ntf-campana { position: relative; display: inline-block; cursor: pointer; }
+    .ntf-contador { position: absolute; top: -8px; right: -10px; min-width: 18px; height: 18px; padding: 0 5px; background: #d85b70; color: #fff; border-radius: 10px; font-size: 11px; font-weight: bold; line-height: 18px; text-align: center; }
+    .ntf-panel { position: fixed; top: 85px; right: 25px; width: 330px; max-width: calc(100vw - 20px); max-height: 70vh; overflow-y: auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, .13); z-index: 20000; }
+    .ntf-titulo { padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
+    .ntf-titulo span { color: #888; font-size: 13px; }
+    .ntf-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid #eee; }
+    .ntf-icono { width: 38px; height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #fff0e0; border-radius: 50%; }
+    .ntf-texto { display: flex; flex-direction: column; gap: 3px; }
+    .ntf-texto span { color: #777; font-size: 13px; }
+    .ntf-vacio { padding: 25px; text-align: center; color: #888; }
+    @media (max-width: 600px) { .ntf-panel { right: 10px; top: 110px; } }
+  </style>
+</head>
+
+<body>
+  <!-- MENU LATERAL MORADO (se abre con la hamburguesa) -->
+  <div id="hambFondo" class="hamb-fondo" onclick="hambCerrar()"></div>
+
+  <div id="menuInventario" aria-hidden="true">
+    <div class="hamb-cab">
+      <div class="hamb-logo-grupo">
+        <div class="hamb-logo">
+          <img src="./img/logo-instituto.jpg" alt="Logo del Instituto" onerror="this.onerror=null;this.src='img/logo1.png'">
+        </div>
+        <div>
+          <p class="hamb-titulo">Inventario</p>
+          <p class="hamb-sub">Escolar</p>
+        </div>
+      </div>
+
+      <button type="button" class="hamb-cerrar" onclick="hambCerrar()" aria-label="Cerrar menú">×</button>
+    </div>
+
+    <a href="alimentos.html" class="hamb-item" onclick="hambCerrar()">
+      <span>🏠</span><span>Panel de Control</span>
+    </a>
+
+    <a href="catalogo.html" class="hamb-item" onclick="hambCerrar()">
+      <span>📦</span><span>Catálogo</span>
+    </a>
+
+    <a href="entradas.html" class="hamb-item" onclick="hambCerrar()">
+      <span>🍽️</span><span>Menú</span>
+    </a>
+
+    <a href="indext.html" class="hamb-item" onclick="hambCerrar()">
+      <span>⬆️</span><span>Entradas</span>
+    </a>
+
+    <a href="Index1.html" class="hamb-item activo" onclick="hambCerrar()">
+      <span>⬇️</span><span>Salidas</span>
+    </a>
+
+    <button type="button" class="hamb-item" onclick="hambConfiguracion()">
+      <span>⚙️</span><span>Configuración</span>
+    </button>
+
+    <div class="hamb-sesion">
+      <button type="button" class="hamb-item" onclick="hambCerrarSesion()">
+        <span>🚪</span><span>Cerrar sesión</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="fondoMenu" class="fondo-menu"></div>
+
+  <div class="dashboard-container sistema">
+    <aside class="sidebar menu-lateral">
+      <img src="img/logo-instituto.jpg"
+           alt="Logo Instituto"
+           class="brand-logo-img logo-instituto">
+
+      <div class="nombre-logo">
+        <strong>Instituto Nacional</strong>
+        <span>Prof. Bertha Fidelia Cañas</span>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-item" onclick="window.location.href='alimentos.html'">
+          <span class="icono-menu panel-icon">🔲</span>
+          <span>Panel de Control</span>
+        </button>
+
+        <button class="menu-item" onclick="window.location.href='catalogo.html'">
+          <span class="icono-menu catalogo-icon">📄</span>
+          <span>Catálogo</span>
+        </button>
+
+        <button class="menu-item" onclick="window.location.href='entradas.html'">
+          <span class="icono-menu">📋</span>
+          <span>Menú</span>
+        </button>
+
+        <button class="menu-item" onclick="window.location.href='indext.html'">
+          <span class="icono-menu entrada-icon">⬆️</span>
+          <span>Entradas</span>
+        </button>
+
+        <button class="menu-item active" onclick="window.location.href='Index1.html'">
+          <span class="icono-menu salida-icon">⬇️</span>
+          <span>Salidas</span>
+        </button>
+
+        <button class="menu-item" onclick="mostrarModulo('configuracion', this)">
+          <span class="icono-menu config-icon">⚙️</span>
+          <span>Configuración</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="menu-item logout cerrar-sesion" onclick="logoutAccount()">
+          <span class="icono-salir">🚪</span>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content contenido">
+      <header class="top-header cabecera">
+        <button id="btnHamburguesa" class="btn-hamburguesa"
+                type="button" aria-label="Abrir menú">☰</button>
+
+        <button type="button" id="hambBtn" class="hamb-btn"
+                onclick="hambAlternar()" aria-label="Abrir menú">☰</button>
+
+        <div class="header-titles titulo">
+          <h1 id="tituloModulo">Reportes de Salidas</h1>
+          <p id="subtituloModulo">Sistema de Control de Alimentos Escolares</p>
+        </div>
+
+        <div class="account-container usuario">
+          <div class="user-profile" onclick="toggleMenuCuenta(event)">
+            <span class="notification-icon ntf-campana" id="ntfCampana" onclick="ntfAlternar(event)" title="Notificaciones">🔔<span id="ntfContador" class="ntf-contador">0</span></span>
+
+            <div class="avatar" id="avatarContainer">
+              <img id="fotoAdministrador" src="" alt="Foto de perfil" class="hidden">
+              <span id="iconoAdministrador">👤</span>
+            </div>
+
+            <div class="user-info-header">
+              <span class="username" id="nombreAdministrador">Admin</span>
+              <small class="user-role" id="rolAdministrador">Administrador</small>
+            </div>
+
+            <span class="dropdown-arrow">▼</span>
+          </div>
+
+          <div id="menuCuenta" class="edit-dropdown account-dropdown hidden">
+            <div class="account-info-header">
+              <p id="menuNombre" class="font-bold">Admin</p>
+              <p id="menuCorreo" class="text-muted">admin@instituto.com</p>
+            </div>
+
+            <button class="dropdown-btn" type="button" onclick="abrirMiCuenta()">👤 Mi cuenta</button>
+            <button class="dropdown-btn" type="button" onclick="abrirAgregarCuenta()">➕ Agregar cuenta</button>
+            <button class="dropdown-btn" type="button" onclick="abrirCambiarCuenta()">🔄 Cambiar cuenta</button>
+          </div>
+        </div>
+      </header>
+
+      <div id="contenidoModulo">
+        <section class="charts-section">
+          <div class="chart-container line-chart-box">
+            <button class="btn-corner-edit" title="Cambiar tipo de gráfica"
+                    onclick="toggleEditDropdown('editLineChartPanel', event)">✏️</button>
+
+            <div id="editLineChartPanel" class="edit-dropdown hidden">
+              <h4>Tipo de Gráfica (Histórico)</h4>
+              <label for="selectLineChartType">Tipo:</label>
+              <select id="selectLineChartType"
+                      onchange="changeLineChartType(this.value)">
+                <option value="line">Líneas</option>
+                <option value="bar">Barras</option>
+              </select>
+            </div>
+
+            <canvas id="lineChart"></canvas>
+          </div>
+
+          <div class="chart-container donut-chart-box">
+            <button class="btn-corner-edit" title="Cambiar tipo de gráfica"
+                    onclick="toggleEditDropdown('editDonutChartPanel', event)">✏️</button>
+
+            <div id="editDonutChartPanel" class="edit-dropdown hidden">
+              <h4>Tipo de Gráfica (Distribución)</h4>
+              <label for="selectDonutChartType">Tipo:</label>
+              <select id="selectDonutChartType"
+                      onchange="changeDonutChartType(this.value)">
+                <option value="doughnut">Dona</option>
+                <option value="pie">Pastel</option>
+                <option value="bar">Barras</option>
+              </select>
+            </div>
+
+            <canvas id="donutChart"></canvas>
+          </div>
+        </section>
+
+        <section class="table-section">
+          <div class="table-card">
+            <button class="btn-corner-edit" title="Editar opciones de tabla"
+                    onclick="toggleEditDropdown('editTablePanel', event)">✏️</button>
+
+            <div id="editTablePanel" class="edit-dropdown hidden">
+              <h4>Configurar Tabla</h4>
+              <p style="margin-bottom:6px;font-weight:600;">Visibilidad de columnas:</p>
+
+              <div class="checkbox-group">
+                <label><input type="checkbox" checked onchange="toggleTableColumn(1, this.checked)"> Cantidad</label>
+                <label><input type="checkbox" checked onchange="toggleTableColumn(2, this.checked)"> Fecha</label>
+                <label><input type="checkbox" checked onchange="toggleTableColumn(3, this.checked)"> Hora</label>
+                <label><input type="checkbox" checked onchange="toggleTableColumn(4, this.checked)"> Destino</label>
+                <label><input type="checkbox" checked onchange="toggleTableColumn(5, this.checked)"> Responsable</label>
+              </div>
+
+              <button class="btn-save" style="margin-top:8px"
+                      onclick="addNewRowPrompt()">+ Agregar Nuevo Registro</button>
+            </div>
+
+            <div class="table-header">
+              <div class="table-header-left">
+                <h2>Registro de Salidas</h2>
+              </div>
+
+              <div class="filter-box">
+                <span class="filter-icon">🔍</span>
+                <input type="text" id="filterInput"
+                       placeholder="Filtrar por producto o responsable..."
+                       oninput="filterTable()">
+              </div>
+            </div>
+
+            <div class="table-wrapper">
+              <table id="salidasTable">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Destino</th>
+                    <th>Responsable</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalCuenta" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="tituloCuenta">👤 Mi cuenta</h3>
+        <button class="modal-close" type="button"
+                onclick="cerrarModal('modalCuenta')">✕</button>
+      </div>
+
+      <div class="photo-preview-container">
+        <div class="photo-circle">
+          <img id="previewFoto" src="" alt="Foto" class="hidden">
+          <span id="previewIcono">👤</span>
+        </div>
+
+        <label class="btn-upload-photo">
+          📷 Seleccionar foto
+          <input id="fotoCuenta" type="file" accept="image/*"
+                 class="hidden" onchange="previsualizarFoto(event)">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="cuentaNombre">Nombre</label>
+        <input id="cuentaNombre" type="text" placeholder="Nombre completo">
+      </div>
+
+      <div class="form-group">
+        <label for="cuentaCorreo">Correo</label>
+        <input id="cuentaCorreo" type="email" placeholder="correo@instituto.com">
+      </div>
+
+      <div class="form-group">
+        <label for="cuentaRol">Rol</label>
+        <select id="cuentaRol">
+          <option value="Administrador">Administrador</option>
+          <option value="Encargado de inventario">Encargado de inventario</option>
+          <option value="Consulta">Consulta</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnEliminarCuenta" class="btn-danger" type="button"
+                onclick="eliminarCuenta()">🗑️ Eliminar</button>
+
+        <div class="modal-footer-right">
+          <button class="btn-secondary" type="button"
+                  onclick="cerrarModal('modalCuenta')">Cancelar</button>
+          <button class="btn-save" type="button"
+                  onclick="guardarCuenta()">💾 Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCambiarCuenta" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🔄 Cambiar cuenta</h3>
+        <button class="modal-close" type="button"
+                onclick="cerrarModal('modalCambiarCuenta')">✕</button>
+      </div>
+
+      <p class="modal-subtitle">Selecciona la cuenta que deseas utilizar.</p>
+      <div id="listaCuentas" class="account-list"></div>
+
+      <div class="modal-footer" style="justify-content:flex-end">
+        <button class="btn-secondary" type="button"
+                onclick="cerrarModal('modalCambiarCuenta')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ntfPanel" class="ntf-panel hidden">
+    <div class="ntf-titulo"><strong>Notificaciones</strong><span id="ntfTexto">0 alertas</span></div>
+    <div id="ntfLista"><p class="ntf-vacio">No hay alertas.</p></div>
+  </div>
+
+  <script src="Java1.js"></script>
+
+  <!-- FUNCIONES DE LA HAMBURGUESA MORADA -->
+  <script>
+    function hambAbrir() {
+      var menu = document.getElementById("menuInventario");
+      var fondo = document.getElementById("hambFondo");
+      if (!menu) return;
+      menu.classList.add("abierto");
+      menu.setAttribute("aria-hidden", "false");
+      if (fondo) fondo.classList.add("visible");
+      document.body.style.overflow = "hidden";
+    }
+
+    function hambCerrar() {
+      var menu = document.getElementById("menuInventario");
+      var fondo = document.getElementById("hambFondo");
+      if (menu) {
+        menu.classList.remove("abierto");
+        menu.setAttribute("aria-hidden", "true");
+      }
+      if (fondo) fondo.classList.remove("visible");
+      document.body.style.overflow = "";
+    }
+
+    function hambAlternar() {
+      var menu = document.getElementById("menuInventario");
+      if (menu && menu.classList.contains("abierto")) hambCerrar();
+      else hambAbrir();
+    }
+
+    /* Configuración: usa el mismo botón que ya tenía el menú anterior */
+    function hambConfiguracion() {
+      hambCerrar();
+      var boton = document.querySelector('.menu-lateral .menu-item[onclick*="configuracion"]');
+      if (boton) boton.click();
+    }
+
+    /* Cerrar sesión: usa la misma función que ya existía */
+    function hambCerrarSesion() {
+      hambCerrar();
+      if (typeof logoutAccount === "function") logoutAccount();
+    }
+
+    /* NOTIFICACIONES (campana): mismas alertas que el Catálogo y el Panel */
+    function ntfEsc(t) {
+      return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function ntfProductos() {
+      var claves = ["productosInventario", "productos", "inventarioEscolar"];
+      for (var i = 0; i < claves.length; i++) {
+        try {
+          var v = JSON.parse(localStorage.getItem(claves[i]) || "null");
+          if (Array.isArray(v)) return v.filter(function (p) { return p && typeof p === "object"; });
+        } catch (e) { /* seguir con la siguiente clave */ }
+      }
+      return [];
+    }
+
+    function ntfMinimo(p) {
+      var v = (p.minimo !== undefined && p.minimo !== null) ? p.minimo : p.stockMinimo;
+      var n = parseFloat(v);
+      return (v === undefined || v === null || v === "" || isNaN(n)) ? 5 : n;
+    }
+
+    function ntfDias(texto) {
+      var t = String(texto || "").trim(), f = null;
+      var m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (m) f = new Date(+m[1], +m[2] - 1, +m[3]);
+      else {
+        m = t.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+        if (m) f = new Date(+m[3], +m[2] - 1, +m[1]);
+      }
+      if (!f || isNaN(f.getTime())) return null;
+      var hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      return Math.round((f - hoy) / 86400000);
+    }
+
+    function ntfAlertas() {
+      var lista = [];
+      ntfProductos().forEach(function (p) {
+        var nombre = p.nombre || p.producto || "Producto";
+        if (Number(p.cantidad) <= ntfMinimo(p)) {
+          lista.push({ titulo: "Stock bajo", detalle: nombre + ": " + p.cantidad + " " + (p.unidad || "") });
+        }
+        var d = ntfDias(p.vencimiento);
+        if (d !== null) {
+          if (d < 0) lista.push({ titulo: "Producto vencido", detalle: nombre + ": venció hace " + Math.abs(d) + " día(s)" });
+          else if (d === 0) lista.push({ titulo: "Vence hoy", detalle: nombre + ": vence hoy" });
+          else if (d <= 7) lista.push({ titulo: "Próximo a vencer", detalle: nombre + ": vence en " + d + " día(s)" });
+        }
+      });
+      return lista;
+    }
+
+    function ntfActualizar() {
+      var lista = ntfAlertas(), n = lista.length;
+      var c = document.getElementById("ntfContador");
+      var t = document.getElementById("ntfTexto");
+      var l = document.getElementById("ntfLista");
+      if (c) c.textContent = n;
+      if (t) t.textContent = n + (n === 1 ? " alerta" : " alertas");
+      if (l) l.innerHTML = n ? lista.map(function (a) {
+        return '<div class="ntf-item"><span class="ntf-icono">⚠️</span><div class="ntf-texto"><strong>' +
+          ntfEsc(a.titulo) + '</strong><span>' + ntfEsc(a.detalle) + '</span></div></div>';
+      }).join("") : '<p class="ntf-vacio">No hay alertas.</p>';
+    }
+
+    function ntfAlternar(e) {
+      if (e) e.stopPropagation();
+      var panel = document.getElementById("ntfPanel");
+      if (!panel) return;
+      ntfActualizar();
+      panel.classList.toggle("hidden");
+      var menu = document.getElementById("menuCuenta");
+      if (menu) menu.classList.add("hidden");
+    }
+
+    document.addEventListener("click", function (e) {
+      var panel = document.getElementById("ntfPanel");
+      if (panel && !panel.contains(e.target)) panel.classList.add("hidden");
+    });
+    window.addEventListener("focus", ntfActualizar);
+    window.addEventListener("pageshow", ntfActualizar);
+    window.addEventListener("storage", ntfActualizar);
+    setInterval(ntfActualizar, 2000);
+    ntfActualizar();
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") hambCerrar();
+    });
+  </script>
+</body>
+</html>

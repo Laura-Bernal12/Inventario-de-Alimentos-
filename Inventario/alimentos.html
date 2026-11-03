@@ -1,0 +1,4777 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panel de Control - Inventario Escolar</title>
+
+    <link href="./output.css" rel="stylesheet">
+<style>
+/* Ajustes responsivos para móviles, tabletas y escritorio */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+body { overflow-x: hidden; }
+#menuInventario {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  width: min(320px, 86vw) !important;
+  max-width: min(320px, 86vw) !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow-y: auto !important;
+  border-radius: 0 14px 14px 0 !important;
+  z-index: 9999 !important;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  box-shadow: 8px 0 28px rgba(0,0,0,.14);
+}
+#menuInventario a, #menuInventario button { min-height: 54px; font-size: 1rem; }
+body.menu-inventario-abierto { overflow: hidden; }
+@media (max-width: 640px) {
+  header { padding-left: 12px !important; padding-right: 12px !important; }
+  #menuInventario { top: 0 !important; bottom: 0 !important; left: 0 !important; right: auto !important; width: min(320px, 86vw) !important; height: 100dvh !important; max-width: min(320px, 86vw) !important; max-height: 100dvh !important; }
+  main, .min-h-screen > main { padding-left: 12px !important; padding-right: 12px !important; }
+  .grid.grid-cols-1.md\:grid-cols-3 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+  #categorias, #listaActividad, #listaAlertas { min-width: 0; overflow-wrap: anywhere; }
+  #categorias > div, #listaActividad > div { gap: 10px; }
+  #listaActividad > div > div { min-width: 0; }
+  button { max-width: 100%; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  .grid.grid-cols-1.md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+</style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- =====================================================
+         CONTENEDOR PRINCIPAL
+    ====================================================== -->
+
+    <div class="min-h-screen">
+
+        <!-- =====================================================
+             ENCABEZADO SUPERIOR CON HAMBURGUESA
+        ====================================================== -->
+
+        <header class="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-40">
+
+            <div class="flex justify-between items-center">
+
+                <!-- IZQUIERDA -->
+
+                <div class="flex items-center gap-4">
+
+                    <!-- HAMBURGUESA -->
+
+                    <div class="relative">
+
+                        <button
+                            onclick="toggleMenuInventario()"
+                            class="w-11 h-11 rounded-lg
+                                   bg-purple-100
+                                   text-purple-700
+                                   text-2xl
+                                   flex items-center justify-center
+                                   hover:bg-purple-200
+                                   transition">
+
+                            ☰
+
+                        </button>
+
+
+                        <!-- MENÚ DESPLEGABLE -->
+
+                        <div
+                            id="menuInventario"
+                            class="hidden fixed inset-0 w-screen h-screen bg-white overflow-y-auto z-[9999]">
+
+                            <!-- LOGO -->
+
+                            <div class="p-5 border-b border-gray-200 flex items-center justify-between gap-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-12 h-12 rounded-xl
+                                               overflow-hidden
+                                               border border-gray-200
+                                               bg-white
+                                               flex items-center
+                                               justify-center">
+
+                                        <img
+                                            src="./img/logo-instituto.jpg"
+                                            alt="Logo del Instituto"
+                                            class="w-full h-full object-contain">
+
+                                    </div>
+
+                                    <div>
+
+                                        <h1 class="font-bold text-gray-800">
+                                            Inventario
+                                        </h1>
+
+                                        <p class="text-xs text-gray-500">
+                                            Escolar
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <button type="button" onclick="cerrarMenuInventario()" aria-label="Cerrar menú"
+                                    class="min-w-[48px] min-h-[48px] rounded-xl bg-gray-100 hover:bg-gray-200 text-3xl text-gray-700">×</button>
+
+                            </div>
+                             
+                        
+
+                            <!-- PANEL -->
+
+                            <a
+                                href="alimentos.html"
+                                onclick="cerrarMenuInventario()"
+                                class="flex items-center gap-3
+                                       px-5 py-4
+                                       bg-purple-100
+                                       text-purple-700
+                                       font-semibold">
+
+                                🏠
+
+                                <span>
+                                    Panel de Control
+                                </span>
+
+                            </a>
+
+
+                            <!-- CATÁLOGO -->
+
+                            <a
+                                href="catalogo.html"
+                                onclick="cerrarMenuInventario()"
+                                class="flex items-center gap-3
+                                       px-5 py-4
+                                       text-gray-600
+                                       hover:bg-gray-100
+                                       transition">
+
+                                📦
+
+                                <span>
+                                    Catálogo
+                                </span>
+
+                            </a>
+
+<!-- MENÚ -->
+
+<a
+    href="entradas.html"
+    onclick="cerrarMenuInventario()"
+    class="flex items-center gap-3
+           px-5 py-4
+           text-gray-600
+           hover:bg-gray-100
+           transition">
+
+    <span class="text-lg">
+        🍽️
+    </span>
+
+    <span>
+        Menú
+    </span>
+
+</a>
+                          
+                        <!-- ENTRADAS -->
+
+                            <a
+                                href="indext.html"
+                                onclick="cerrarMenuInventario()"
+                                class="flex items-center gap-3
+                                       px-5 py-4
+                                       text-gray-600
+                                       hover:bg-gray-100
+                                       transition">
+
+                                ⬆️
+
+                                <span>
+                                    Entradas
+                                </span>
+
+                            </a>    
+
+
+                            <!-- SALIDAS -->
+
+                            <a
+                                href="index1.html"
+                                onclick="cerrarMenuInventario()"
+                                class="flex items-center gap-3
+                                       px-5 py-4
+                                       text-gray-600
+                                       hover:bg-gray-100
+                                       transition">
+
+                                ⬇️
+
+                                <span>
+                                    Salidas
+                                </span>
+
+                            </a>
+
+
+                            <!-- CONFIGURACIÓN -->
+
+                            <button
+                                onclick="abrirConfiguracion(); cerrarMenuInventario()"
+                                class="w-full flex items-center gap-3
+                                       px-5 py-4
+                                       text-gray-600
+                                       hover:bg-gray-100
+                                       transition text-left">
+
+                                ⚙️
+
+                                <span>
+                                    Configuración
+                                </span>
+
+                            </button>
+
+
+                            <!-- CERRAR SESIÓN -->
+
+                            <div class="border-t border-gray-200">
+
+                                <button
+                                    onclick="cerrarSesion(); cerrarMenuInventario()"
+                                    class="w-full flex items-center gap-3
+                                           px-5 py-4
+                                           text-gray-600
+                                           hover:bg-red-50
+                                           hover:text-red-600
+                                           transition">
+
+                                    🚪
+
+                                    <span>
+                                        Cerrar sesión
+                                    </span>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TÍTULO -->
+
+                    <div>
+
+                        <h2 class="text-xl font-bold">
+                            Inventario Escolar
+                        </h2>
+
+                        <p class="text-xs text-gray-500">
+                            Panel de Control
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PARTE DERECHA -->
+
+                <div class="flex items-center gap-5">
+
+                    <!-- NOTIFICACIONES -->
+
+                    <button
+                        onclick="mostrarNotificaciones()"
+                        class="relative text-xl
+                               hover:text-purple-600
+                               transition">
+
+                        🔔
+
+                        <span
+                            id="contadorAlertas"
+                            class="absolute -top-2 -right-2
+                                   bg-red-500 text-white
+                                   text-xs w-5 h-5
+                                   rounded-full
+                                   flex items-center
+                                   justify-center">
+
+                            0
+
+                        </span>
+
+                    </button>
+
+
+                    <!-- PERFIL -->
+
+                    <div class="relative">
+
+                        <button
+                            onclick="toggleMenuCuenta()"
+                            class="flex items-center gap-2
+                                   hover:bg-gray-100
+                                   rounded-xl px-2 py-1
+                                   transition">
+
+                            <div
+                                class="w-10 h-10 rounded-full
+                                       overflow-hidden
+                                       bg-gray-200
+                                       flex items-center
+                                       justify-center">
+
+                                <img
+                                    id="fotoAdministrador"
+                                    src=""
+                                    alt="Foto de perfil"
+                                    class="w-full h-full object-cover hidden">
+
+                                <span
+                                    id="iconoAdministrador"
+                                    class="text-xl">
+
+                                    👤
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="text-left">
+
+                                <p
+                                    id="nombreAdministrador"
+                                    class="font-semibold text-sm">
+
+                                    Admin
+
+                                </p>
+
+                                <p
+                                    id="rolAdministrador"
+                                    class="text-xs text-gray-500">
+
+                                    Administrador
+
+                                </p>
+
+                            </div>
+
+                            <span class="text-gray-400">
+                                ▾
+                            </span>
+
+                        </button>
+
+
+                        <!-- MENÚ DE CUENTA -->
+
+                        <div
+                            id="menuCuenta"
+                            class="hidden absolute right-0
+                                   mt-2 w-64 bg-white
+                                   border border-gray-200
+                                   rounded-xl shadow-xl
+                                   z-40 overflow-hidden">
+
+                            <div
+                                class="p-4 border-b
+                                       border-gray-200">
+
+                                <p
+                                    id="menuNombre"
+                                    class="font-bold">
+
+                                    Admin
+
+                                </p>
+
+                                <p
+                                    id="menuCorreo"
+                                    class="text-xs text-gray-500">
+
+                                    admin@instituto.com
+
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                onclick="abrirMiCuenta()"
+                                class="w-full text-left
+                                       px-4 py-3
+                                       hover:bg-gray-50">
+
+                                👤 Mi cuenta
+
+                            </button>
+
+
+                            <button
+                                onclick="abrirAgregarCuenta()"
+                                class="w-full text-left
+                                       px-4 py-3
+                                       hover:bg-gray-50">
+
+                                ➕ Agregar cuenta
+
+                            </button>
+
+
+                            <button
+                                onclick="abrirCambiarCuenta()"
+                                class="w-full text-left
+                                       px-4 py-3
+                                       hover:bg-gray-50">
+
+                                🔄 Cambiar cuenta
+
+                            </button>
+
+                            <button
+                                onclick="abrirCentroAyuda(); cerrarMenuCuenta();"
+                                class="w-full text-left
+                                       px-4 py-3
+                                       hover:bg-purple-50 text-purple-700">
+
+                                🆘 Ayuda
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             CONTENIDO PRINCIPAL
+        ====================================================== -->
+
+        <main class="min-w-0">
+
+            <section class="p-8">
+
+                <!-- BOTÓN EDITAR -->
+
+                <div class="flex justify-end mb-5">
+
+                    <button
+                        onclick="abrirEditorPanel()"
+                        class="bg-purple-600
+                               hover:bg-purple-700
+                               text-white px-5 py-2.5
+                               rounded-lg font-semibold
+                               transition">
+
+                        ✏️ Editar panel
+
+                    </button>
+
+                </div>
+
+
+                <!-- TARJETAS -->
+
+                <div
+                    class="grid gap-3"
+                    style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;">
+
+
+                    <!-- TOTAL PRODUCTOS -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-3 shadow-sm">
+
+                        <div class="flex justify-between">
+
+                            <div
+                                class="w-9 h-9 rounded-lg
+                                       bg-purple-100
+                                       flex items-center
+                                       justify-center text-xl">
+
+                                📦
+
+                            </div>
+
+                            <span class="text-green-500 text-xl">
+                                ↗
+                            </span>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-2">
+                            Total Productos
+                        </p>
+
+                        <h3
+                            id="totalProductos"
+                            class="text-2xl font-bold">
+
+                            6
+
+                        </h3>
+
+                        <p class="text-xs text-green-500 mt-1">
+                            +12% vs mes anterior
+                        </p>
+
+                    </div>
+
+
+                    <!-- STOCK BAJO -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-3 shadow-sm">
+
+                        <div class="flex justify-between">
+
+                            <div
+                                class="w-9 h-9 rounded-lg
+                                       bg-red-50
+                                       flex items-center
+                                       justify-center text-xl">
+
+                                ⚠️
+
+                            </div>
+
+                            <span class="text-red-500 text-xl">
+                                ↘
+                            </span>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-2">
+                            Stock Bajo
+                        </p>
+
+                        <h3
+                            id="stockBajo"
+                            class="text-2xl font-bold">
+
+                            2
+
+                        </h3>
+
+                        <p class="text-xs text-red-500 mt-1">
+                            Requiere reposición
+                        </p>
+
+                        <div id="productosStockBajo"
+                             class="mt-2 space-y-1 text-xs text-gray-600">
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRÓXIMOS A VENCER -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-3 shadow-sm">
+
+                        <div class="flex justify-between">
+
+                            <div
+                                class="w-9 h-9 rounded-lg
+                                       bg-yellow-50
+                                       flex items-center
+                                       justify-center text-xl">
+
+                                📅
+
+                            </div>
+
+                            <span class="text-orange-500 text-xl">
+                                ⚠
+                            </span>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-2">
+                            Próximos a vencer
+                        </p>
+
+                        <h3
+                            id="proximosVencer"
+                            class="text-2xl font-bold">
+
+                            0
+
+                        </h3>
+
+                        <p class="text-xs text-red-500 mt-1">
+                            En los próximos 7 días
+                        </p>
+
+                    </div>
+
+
+                                    </div>
+
+
+                <!-- SEGUNDA FILA -->
+
+                <div
+                    class="grid grid-cols-1 lg:grid-cols-2
+                           gap-6 mt-6">
+
+
+                    <!-- CATEGORÍAS -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-5">
+
+                        <div
+                            class="flex justify-between
+                                   items-center mb-5">
+
+                            <h3 class="font-bold text-lg">
+                                📊 Productos por Categoría
+                            </h3>
+
+                            <button
+                                onclick="editarCategorias()"
+                                class="text-purple-600
+                                       text-sm font-semibold
+                                       hover:underline">
+
+                                ✏️ Editar
+
+                            </button>
+
+                        </div>
+
+                        <div id="categorias">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ALERTAS -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-5">
+
+                        <div
+                            class="flex justify-between
+                                   items-center mb-4">
+
+                            <h3 class="font-bold text-lg">
+                                ⚠️ Alertas de Inventario
+                            </h3>
+
+                            <button
+                                onclick="editarAlertas()"
+                                class="text-purple-600
+                                       text-sm font-semibold
+                                       hover:underline">
+
+                                ✏️ Editar
+
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="listaAlertas"
+                            class="space-y-2">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIVIDAD -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-5">
+
+                        <div
+                            class="flex justify-between
+                                   items-center mb-4">
+
+                            <h3 class="font-bold text-lg">
+                                Actividad Reciente
+                            </h3>
+
+                            <div class="flex items-center gap-3 shrink-0">
+                                <button
+                                    type="button"
+                                    onclick="agregarActividad()"
+                                    class="text-purple-600 text-sm font-semibold hover:underline whitespace-nowrap">
+                                    + Agregar
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="seleccionarProductoParaEliminar()"
+                                    class="text-red-600 text-sm font-semibold hover:underline whitespace-nowrap">
+                                    🗑️ Eliminar
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div
+                            id="listaActividad"
+                            class="space-y-3">
+                        </div>
+
+                    </div>
+
+
+                    <!-- GRÁFICA -->
+
+                    <div
+                        class="bg-white border border-gray-200
+                               rounded-xl p-5">
+
+                        <div
+                            class="flex justify-between
+                                   items-center mb-5">
+
+                            <h3 class="font-bold text-lg">
+                                📈 Productos en Inventario
+                            </h3>
+
+                            <button
+                                onclick="editarGrafica()"
+                                class="text-purple-600
+                                       text-sm font-semibold
+                                       hover:underline">
+
+                                ✏️ Editar
+
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="grafica"
+                            class="h-64 flex items-end
+                                   justify-around gap-4
+                                   border-b
+                                   border-gray-200
+                                   overflow-x-auto
+                                   pb-2">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- =========================================================
+         MODAL EDITAR PANEL
+    ========================================================== -->
+
+    <div
+        id="modalEditor"
+        class="hidden fixed inset-0
+               bg-black/40 flex items-center
+               justify-center z-50 p-5">
+
+        <div
+            class="bg-white rounded-2xl p-6
+                   w-full max-w-lg">
+
+            <div class="flex justify-between">
+
+                <h2 class="text-xl font-bold">
+                    ✏️ Editar Panel
+                </h2>
+
+                <button
+                    onclick="cerrarModal('modalEditor')"
+                    class="text-xl">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <div class="space-y-4 mt-5">
+
+                <div>
+
+                    <label class="text-sm font-semibold">
+                        Total de productos
+                    </label>
+
+                    <input
+                        id="editarProductos"
+                        type="number"
+                        min="0"
+                        readonly
+                        title="Se calcula automáticamente desde los productos registrados"
+                        class="w-full border bg-gray-100
+                               rounded-lg px-3 py-2 mt-1">
+
+                </div>
+
+
+                <div>
+
+                    <label class="text-sm font-semibold">
+                        Stock bajo
+                    </label>
+
+                    <input
+                        id="editarStock"
+                        type="number"
+                        min="0"
+                        class="w-full border
+                               rounded-lg px-3 py-2 mt-1">
+
+                </div>
+
+
+                <div>
+
+                    <label class="text-sm font-semibold">
+                        Próximos a vencer
+                    </label>
+
+                    <input
+                        id="editarVencer"
+                        type="number"
+                        min="0"
+                        class="w-full border
+                               rounded-lg px-3 py-2 mt-1">
+
+                </div>
+
+            </div>
+
+            <div
+                class="flex justify-end gap-3 mt-6">
+
+                <button
+                    onclick="cerrarModal('modalEditor')"
+                    class="px-4 py-2 border
+                           rounded-lg">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    onclick="guardarPanel()"
+                    class="px-5 py-2 bg-purple-600
+                           text-white rounded-lg
+                           font-semibold">
+
+                    💾 Guardar cambios
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MODAL CUENTA
+    ========================================================== -->
+
+    <div
+        id="modalCuenta"
+        class="hidden fixed inset-0
+               bg-black/40 flex items-center
+               justify-center z-50 p-5">
+
+        <div
+            class="bg-white rounded-2xl
+                   p-6 w-full max-w-lg">
+
+            <div class="flex justify-between">
+
+                <h2
+                    id="tituloCuenta"
+                    class="text-xl font-bold">
+
+                    👤 Mi cuenta
+
+                </h2>
+
+                <button
+                    onclick="cerrarModal('modalCuenta')"
+                    class="text-xl">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <!-- FOTO -->
+
+            <div
+                class="flex flex-col
+                       items-center mt-5">
+
+                <div
+                    class="w-24 h-24 rounded-full
+                           overflow-hidden bg-gray-100
+                           border-4 border-purple-100
+                           flex items-center
+                           justify-center">
+
+                    <img
+                        id="previewFoto"
+                        src=""
+                        alt="Foto"
+                        class="w-full h-full
+                               object-cover hidden">
+
+                    <span
+                        id="previewIcono"
+                        class="text-4xl">
+
+                        👤
+
+                    </span>
+
+                </div>
+
+
+                <label
+                    class="mt-3 cursor-pointer
+                           text-purple-600
+                           font-semibold
+                           hover:underline">
+
+                    📷 Seleccionar foto
+
+                    <input
+                        id="fotoCuenta"
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        onchange="previsualizarFoto(event)">
+
+                </label>
+
+            </div>
+
+
+            <!-- DATOS -->
+
+            <div class="space-y-4 mt-6">
+
+                <div>
+
+                    <label class="text-sm font-semibold">
+                        Nombre
+                    </label>
+
+                    <input
+                        id="cuentaNombre"
+                        type="text"
+                        class="w-full border
+                               rounded-lg px-3 py-2 mt-1"
+                        placeholder="Nombre completo">
+
+                </div>
+
+
+                <div>
+
+                    <label class="text-sm font-semibold">
+                        Correo
+                    </label>
+
+                    <input
+                        id="cuentaCorreo"
+                        type="email"
+                        class="w-full border
+                               rounded-lg px-3 py-2 mt-1"
+                        placeholder="correo@instituto.com">
+
+                </div>
+
+
+                <div>
+
+                    <label class="text-sm font-semibold">
+                        Rol
+                    </label>
+
+                    <select
+                        id="cuentaRol"
+                        class="w-full border
+                               rounded-lg px-3 py-2 mt-1">
+
+                        <option value="Administrador">
+                            Administrador
+                        </option>
+
+                        <option value="Encargado de inventario">
+                            Encargado de inventario
+                        </option>
+
+                        <option value="Consulta">
+                            Consulta
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTONES -->
+
+            <div
+                class="flex justify-between
+                       items-center mt-6">
+
+                <button
+                    id="btnEliminarCuenta"
+                    onclick="eliminarCuenta()"
+                    class="px-4 py-2
+                           text-red-600
+                           hover:bg-red-50
+                           rounded-lg">
+
+                    🗑️ Eliminar
+
+                </button>
+
+
+                <div class="flex gap-3">
+
+                    <button
+                        onclick="cerrarModal('modalCuenta')"
+                        class="px-4 py-2
+                               border rounded-lg">
+
+                        Cancelar
+
+                    </button>
+
+                    <button
+                        onclick="guardarCuenta()"
+                        class="px-5 py-2
+                               bg-purple-600
+                               text-white
+                               rounded-lg
+                               font-semibold">
+
+                        💾 Guardar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MODAL CAMBIAR CUENTA
+    ========================================================== -->
+
+    <div
+        id="modalCambiarCuenta"
+        class="hidden fixed inset-0
+               bg-black/40 flex items-center
+               justify-center z-50 p-5">
+
+        <div
+            class="bg-white rounded-2xl
+                   p-6 w-full max-w-md">
+
+            <h2 class="text-xl font-bold">
+                🔄 Cambiar cuenta
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Selecciona la cuenta que deseas utilizar.
+            </p>
+
+            <div
+                id="listaCuentas"
+                class="space-y-2 mt-5">
+            </div>
+
+            <div class="flex justify-end mt-5">
+
+                <button
+                    onclick="cerrarModal('modalCambiarCuenta')"
+                    class="px-4 py-2 border
+                           rounded-lg">
+
+                    Cerrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MODAL CATEGORÍAS
+    ========================================================== -->
+
+    <div
+        id="modalCategorias"
+        class="hidden fixed inset-0
+               bg-black/40 flex items-center
+               justify-center z-50 p-5">
+
+        <div
+            class="bg-white rounded-2xl
+                   p-6 w-full max-w-lg">
+
+            <h2 class="text-xl font-bold">
+                📊 Editar Categorías
+            </h2>
+
+            <div
+                id="formCategorias"
+                class="space-y-3 mt-5">
+            </div>
+
+            <div
+                class="flex justify-end
+                       gap-3 mt-6">
+
+                <button
+                    onclick="cerrarModal('modalCategorias')"
+                    class="px-4 py-2 border
+                           rounded-lg">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    onclick="guardarCategorias()"
+                    class="px-5 py-2
+                           bg-purple-600
+                           text-white rounded-lg
+                           font-semibold">
+
+                    💾 Guardar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MODAL ALERTAS
+    ========================================================== -->
+
+    <div
+        id="modalAlertas"
+        class="hidden fixed inset-0
+               bg-black/40 flex items-center
+               justify-center z-50 p-5">
+
+        <div
+            class="bg-white rounded-2xl
+                   p-6 w-full max-w-lg">
+
+            <h2 class="text-xl font-bold">
+                ⚠️ Editar Alertas
+            </h2>
+
+            <div
+                id="formAlertas"
+                class="space-y-3 mt-5">
+            </div>
+
+            <button
+                onclick="agregarCampoAlerta()"
+                class="mt-4 text-purple-600
+                       font-semibold">
+
+                + Agregar alerta
+
+            </button>
+
+            <div
+                class="flex justify-end
+                       gap-3 mt-6">
+
+                <button
+                    onclick="cerrarModal('modalAlertas')"
+                    class="px-4 py-2 border
+                           rounded-lg">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    onclick="guardarAlertas()"
+                    class="px-5 py-2
+                           bg-purple-600
+                           text-white rounded-lg
+                           font-semibold">
+
+                    💾 Guardar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MODAL GRÁFICA
+    ========================================================== -->
+
+    <div
+        id="modalGrafica"
+        class="hidden fixed inset-0
+               bg-black/40 flex items-center
+               justify-center z-50 p-5">
+
+        <div
+            class="bg-white rounded-2xl
+                   p-6 w-full max-w-lg
+                   max-h-[90vh] overflow-y-auto">
+
+            <h2 class="text-xl font-bold">
+                📈 Editar Gráfica
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Puedes modificar o eliminar los productos.
+            </p>
+
+            <div
+                id="formGrafica"
+                class="space-y-3 mt-5">
+            </div>
+
+
+            <div
+                class="flex justify-end
+                       gap-3 mt-6">
+
+                <button
+                    onclick="cerrarModal('modalGrafica')"
+                    class="px-4 py-2 border
+                           rounded-lg">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    onclick="guardarGrafica()"
+                    class="px-5 py-2
+                           bg-purple-600
+                           text-white rounded-lg
+                           font-semibold">
+
+                    💾 Guardar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
+
+    <script>
+
+        /* =====================================================
+           DATOS INICIALES
+        ====================================================== */
+
+        const datosIniciales = {
+
+            productos: 6,
+
+            stockBajo: 2,
+
+            proximosVencer: 0,
+categorias: [
+
+                {
+                    nombre: "Lácteos",
+                    cantidad: 45,
+                    porcentaje: 75
+                },
+
+                {
+                    nombre: "Granos",
+                    cantidad: 120,
+                    porcentaje: 90
+                },
+
+                {
+                    nombre: "Proteínas",
+                    cantidad: 15,
+                    porcentaje: 45
+                },
+
+                {
+                    nombre: "Verduras",
+                    cantidad: 8,
+                    porcentaje: 25
+                },
+
+                {
+                    nombre: "Panadería",
+                    cantidad: 90,
+                    porcentaje: 80
+                }
+
+            ],
+
+            alertas: [
+
+                "Leche Entera",
+                "Arroz Blanco",
+                "Pollo Congelado",
+                "Tomate Fresco",
+                "Pan Integral"
+
+            ],
+
+            actividades: [
+
+                {
+                    nombre: "Leche Entera",
+                    cantidad: "45 Litros"
+                },
+
+                {
+                    nombre: "Arroz Blanco",
+                    cantidad: "120 Kg"
+                },
+
+                {
+                    nombre: "Pollo Congelado",
+                    cantidad: "15 Kg"
+                },
+
+                {
+                    nombre: "Tomate Fresco",
+                    cantidad: "8 Kg"
+                },
+
+                {
+                    nombre: "Pan Integral",
+                    cantidad: "90 Unidades"
+                }
+
+            ],
+
+            grafica: [
+
+                {
+                    nombre: "Leche",
+                    cantidad: 100
+                },
+
+                {
+                    nombre: "Arroz",
+                    cantidad: 150
+                },
+
+                {
+                    nombre: "Pollo",
+                    cantidad: 70
+                },
+
+                {
+                    nombre: "Tomate",
+                    cantidad: 55
+                },
+
+                {
+                    nombre: "Pan",
+                    cantidad: 120
+                }
+
+            ]
+
+        };
+
+
+        /* =====================================================
+           CUENTAS
+        ====================================================== */
+
+        let cuentas =
+            JSON.parse(
+                localStorage.getItem("cuentasInventario")
+            ) || [];
+
+
+        let cuentaActivaId =
+            localStorage.getItem(
+                "cuentaActivaInventario"
+            );
+
+
+        let cuentaEditandoId = null;
+
+        let fotoTemporal = "";
+
+
+        if (cuentas.length === 0) {
+
+            const cuentaInicial = {
+
+                id: Date.now().toString(),
+
+                nombre: "Admin",
+
+                correo: "admin@instituto.com",
+
+                rol: "Administrador",
+
+                foto: ""
+
+            };
+
+            cuentas.push(cuentaInicial);
+
+            cuentaActivaId =
+                cuentaInicial.id;
+
+            guardarCuentas();
+
+        }
+
+
+        /* =====================================================
+           DATOS DEL PANEL
+        ====================================================== */
+
+        let datos =
+            JSON.parse(
+                localStorage.getItem("datosPanel")
+            );
+
+
+        if (!datos) {
+
+            datos =
+                JSON.parse(
+                    JSON.stringify(
+                        datosIniciales
+                    )
+                );
+
+            guardarDatos();
+
+        }
+
+
+        if (!Array.isArray(datos.categorias)) {
+            datos.categorias = [];
+        }
+
+        if (!Array.isArray(datos.alertas)) {
+            datos.alertas = [];
+        }
+
+        if (!Array.isArray(datos.actividades)) {
+            datos.actividades = [];
+        }
+
+        if (!Array.isArray(datos.grafica)) {
+            datos.grafica = [];
+        }
+
+
+        /* =====================================================
+           GUARDAR DATOS
+        ====================================================== */
+
+        function guardarDatos() {
+
+            localStorage.setItem(
+                "datosPanel",
+                JSON.stringify(datos)
+            );
+
+        }
+
+
+        function guardarCuentas() {
+
+            localStorage.setItem(
+                "cuentasInventario",
+                JSON.stringify(cuentas)
+            );
+
+            localStorage.setItem(
+                "cuentaActivaInventario",
+                cuentaActivaId
+            );
+
+        }
+
+
+        /* =====================================================
+           HAMBURGUESA
+        ====================================================== */
+
+        function toggleMenuInventario() {
+            const menu = document.getElementById("menuInventario");
+            if (!menu) return;
+            const seAbrira = menu.classList.contains("hidden");
+            menu.classList.toggle("hidden", !seAbrira);
+            document.body.classList.toggle("menu-inventario-abierto", seAbrira);
+        }
+
+        function cerrarMenuInventario() {
+            const menu = document.getElementById("menuInventario");
+            if (menu) menu.classList.add("hidden");
+            document.body.classList.remove("menu-inventario-abierto");
+        }
+
+
+        /* =====================================================
+           CUENTA ACTIVA
+        ====================================================== */
+
+        function obtenerCuentaActiva() {
+
+            return cuentas.find(
+                cuenta =>
+                    cuenta.id === cuentaActivaId
+            );
+
+        }
+
+
+        function actualizarPerfil() {
+
+            const cuenta =
+                obtenerCuentaActiva();
+
+            if (!cuenta) {
+                return;
+            }
+
+            document.getElementById(
+                "nombreAdministrador"
+            ).textContent =
+                cuenta.nombre;
+
+            document.getElementById(
+                "rolAdministrador"
+            ).textContent =
+                cuenta.rol;
+
+            document.getElementById(
+                "menuNombre"
+            ).textContent =
+                cuenta.nombre;
+
+            document.getElementById(
+                "menuCorreo"
+            ).textContent =
+                cuenta.correo;
+
+
+            const foto =
+                document.getElementById(
+                    "fotoAdministrador"
+                );
+
+            const icono =
+                document.getElementById(
+                    "iconoAdministrador"
+                );
+
+
+            if (cuenta.foto) {
+
+                foto.src = cuenta.foto;
+
+                foto.classList.remove("hidden");
+
+                icono.classList.add("hidden");
+
+            } else {
+
+                foto.classList.add("hidden");
+
+                icono.classList.remove("hidden");
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MENÚ CUENTA
+        ====================================================== */
+
+        function toggleMenuCuenta() {
+
+            document.getElementById(
+                "menuCuenta"
+            ).classList.toggle(
+                "hidden"
+            );
+
+        }
+
+
+        /* =====================================================
+           MI CUENTA
+        ====================================================== */
+
+        function abrirMiCuenta() {
+
+            document.getElementById(
+                "menuCuenta"
+            ).classList.add(
+                "hidden"
+            );
+
+
+            const cuenta =
+                obtenerCuentaActiva();
+
+            if (!cuenta) {
+                return;
+            }
+
+
+            cuentaEditandoId =
+                cuenta.id;
+
+
+            document.getElementById(
+                "tituloCuenta"
+            ).textContent =
+                "👤 Editar mi cuenta";
+
+
+            document.getElementById(
+                "cuentaNombre"
+            ).value =
+                cuenta.nombre;
+
+
+            document.getElementById(
+                "cuentaCorreo"
+            ).value =
+                cuenta.correo;
+
+
+            document.getElementById(
+                "cuentaRol"
+            ).value =
+                cuenta.rol;
+
+
+            fotoTemporal =
+                cuenta.foto || "";
+
+
+            mostrarPreview(
+                fotoTemporal
+            );
+
+
+            document.getElementById(
+                "btnEliminarCuenta"
+            ).classList.remove(
+                "hidden"
+            );
+
+
+            document.getElementById(
+                "modalCuenta"
+            ).classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        /* =====================================================
+           AGREGAR CUENTA
+        ====================================================== */
+
+        function abrirAgregarCuenta() {
+
+            document.getElementById(
+                "menuCuenta"
+            ).classList.add(
+                "hidden"
+            );
+
+
+            cuentaEditandoId = null;
+
+            fotoTemporal = "";
+
+
+            document.getElementById(
+                "tituloCuenta"
+            ).textContent =
+                "➕ Agregar cuenta";
+
+
+            document.getElementById(
+                "cuentaNombre"
+            ).value = "";
+
+
+            document.getElementById(
+                "cuentaCorreo"
+            ).value = "";
+
+
+            document.getElementById(
+                "cuentaRol"
+            ).value =
+                "Administrador";
+
+
+            document.getElementById(
+                "fotoCuenta"
+            ).value = "";
+
+
+            mostrarPreview("");
+
+
+            document.getElementById(
+                "btnEliminarCuenta"
+            ).classList.add(
+                "hidden"
+            );
+
+
+            document.getElementById(
+                "modalCuenta"
+            ).classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        /* =====================================================
+           PREVISUALIZAR FOTO
+        ====================================================== */
+
+        function previsualizarFoto(event) {
+
+            const archivo =
+                event.target.files[0];
+
+            if (!archivo) {
+                return;
+            }
+
+
+            const lector =
+                new FileReader();
+
+
+            lector.onload =
+                function(e) {
+
+                    fotoTemporal =
+                        e.target.result;
+
+                    mostrarPreview(
+                        fotoTemporal
+                    );
+
+                };
+
+
+            lector.readAsDataURL(
+                archivo
+            );
+
+        }
+
+
+        function mostrarPreview(foto) {
+
+            const imagen =
+                document.getElementById(
+                    "previewFoto"
+                );
+
+            const icono =
+                document.getElementById(
+                    "previewIcono"
+                );
+
+
+            if (foto) {
+
+                imagen.src = foto;
+
+                imagen.classList.remove(
+                    "hidden"
+                );
+
+                icono.classList.add(
+                    "hidden"
+                );
+
+            } else {
+
+                imagen.classList.add(
+                    "hidden"
+                );
+
+                icono.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           GUARDAR CUENTA
+        ====================================================== */
+
+        function guardarCuenta() {
+
+            const nombre =
+                document.getElementById(
+                    "cuentaNombre"
+                ).value.trim();
+
+
+            const correo =
+                document.getElementById(
+                    "cuentaCorreo"
+                ).value.trim();
+
+
+            const rol =
+                document.getElementById(
+                    "cuentaRol"
+                ).value;
+
+
+            if (nombre === "") {
+
+                alert(
+                    "⚠️ Debes escribir el nombre."
+                );
+
+                return;
+
+            }
+
+
+            if (correo === "") {
+
+                alert(
+                    "⚠️ Debes escribir el correo."
+                );
+
+                return;
+
+            }
+
+
+            if (cuentaEditandoId) {
+
+                const cuenta =
+                    cuentas.find(
+                        c =>
+                            c.id ===
+                            cuentaEditandoId
+                    );
+
+
+                if (cuenta) {
+
+                    cuenta.nombre = nombre;
+
+                    cuenta.correo = correo;
+
+                    cuenta.rol = rol;
+
+                    cuenta.foto = fotoTemporal;
+
+                }
+
+            } else {
+
+                const nuevaCuenta = {
+
+                    id:
+                        Date.now().toString(),
+
+                    nombre:
+                        nombre,
+
+                    correo:
+                        correo,
+
+                    rol:
+                        rol,
+
+                    foto:
+                        fotoTemporal
+
+                };
+
+
+                cuentas.push(
+                    nuevaCuenta
+                );
+
+
+                cuentaActivaId =
+                    nuevaCuenta.id;
+
+            }
+
+
+            guardarCuentas();
+
+            actualizarPerfil();
+
+            cerrarModal(
+                "modalCuenta"
+            );
+
+
+            alert(
+                "✅ Cuenta guardada correctamente."
+            );
+
+        }
+
+
+        /* =====================================================
+           CAMBIAR CUENTA
+        ====================================================== */
+
+        function abrirCambiarCuenta() {
+
+            document.getElementById(
+                "menuCuenta"
+            ).classList.add(
+                "hidden"
+            );
+
+
+            const lista =
+                document.getElementById(
+                    "listaCuentas"
+                );
+
+
+            lista.innerHTML = "";
+
+
+            cuentas.forEach(
+                cuenta => {
+
+                    const boton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    boton.className =
+                        "w-full flex items-center gap-3 p-3 border rounded-xl hover:bg-gray-50 transition text-left";
+
+
+                    const fotoHTML =
+                        cuenta.foto
+
+                            ? `<img src="${cuenta.foto}"
+                               class="w-11 h-11 rounded-full object-cover">`
+
+                            : `<div class="w-11 h-11 rounded-full
+                                      bg-purple-100 flex items-center
+                                      justify-center text-xl">
+                                  👤
+                               </div>`;
+
+
+                    boton.innerHTML = `
+
+                        ${fotoHTML}
+
+                        <div class="flex-1">
+
+                            <p class="font-semibold">
+                                ${cuenta.nombre}
+                            </p>
+
+                            <p class="text-xs text-gray-500">
+                                ${cuenta.rol}
+                            </p>
+
+                        </div>
+
+                        ${
+                            cuenta.id === cuentaActivaId
+                                ? '<span class="text-green-600 font-bold">✓</span>'
+                                : ''
+                        }
+
+                    `;
+
+
+                    boton.onclick =
+                        function() {
+
+                            cambiarCuenta(
+                                cuenta.id
+                            );
+
+                        };
+
+
+                    lista.appendChild(
+                        boton
+                    );
+
+                }
+            );
+
+
+            document.getElementById(
+                "modalCambiarCuenta"
+            ).classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        function cambiarCuenta(id) {
+
+            cuentaActivaId = id;
+
+            guardarCuentas();
+
+            actualizarPerfil();
+
+            cerrarModal(
+                "modalCambiarCuenta"
+            );
+
+
+            alert(
+                "✅ Cuenta cambiada correctamente."
+            );
+
+        }
+
+
+        /* =====================================================
+           ELIMINAR CUENTA
+        ====================================================== */
+
+        function eliminarCuenta() {
+
+            if (cuentas.length <= 1) {
+
+                alert(
+                    "⚠️ Debes tener al menos una cuenta."
+                );
+
+                return;
+
+            }
+
+
+            const confirmar =
+                confirm(
+                    "¿Seguro que deseas eliminar esta cuenta?"
+                );
+
+
+            if (!confirmar) {
+                return;
+            }
+
+
+            cuentas =
+                cuentas.filter(
+                    cuenta =>
+                        cuenta.id !==
+                        cuentaEditandoId
+                );
+
+
+            cuentaActivaId =
+                cuentas[0].id;
+
+
+            guardarCuentas();
+
+            actualizarPerfil();
+
+            cerrarModal(
+                "modalCuenta"
+            );
+
+
+            alert(
+                "🗑️ Cuenta eliminada."
+            );
+
+        }
+
+
+        /* =====================================================
+           EDITAR PANEL
+        ====================================================== */
+
+        function abrirEditorPanel() {
+
+            document.getElementById(
+                "editarProductos"
+            ).value =
+                obtenerProductosInventario().length;
+
+
+            document.getElementById(
+                "editarStock"
+            ).value =
+                datos.stockBajo;
+
+
+            document.getElementById(
+                "editarVencer"
+            ).value =
+                datos.proximosVencer;
+document.getElementById(
+                "modalEditor"
+            ).classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        function guardarPanel() {
+            const stockInput = document.getElementById("editarStock");
+            const vencerInput = document.getElementById("editarVencer");
+            const productosReales = obtenerProductosInventario().length;
+
+            // El total de productos siempre procede del inventario real; no se guarda un número inventado.
+            datos.productos = productosReales;
+            datos.stockBajo = Math.max(0, Number(stockInput.value) || 0);
+            datos.proximosVencer = Math.max(0, Number(vencerInput.value) || 0);
+            datos.valoresPanelEditados = true;
+            guardarDatos();
+
+            document.getElementById("totalProductos").textContent = String(productosReales);
+            document.getElementById("stockBajo").textContent = String(datos.stockBajo);
+            document.getElementById("proximosVencer").textContent = String(datos.proximosVencer);
+            // Persistencia explícita de los valores editados para que permanezcan al recargar.
+            const verificacion = JSON.parse(localStorage.getItem("datosPanel") || "{}");
+            if (Number(verificacion.stockBajo) !== datos.stockBajo || Number(verificacion.proximosVencer) !== datos.proximosVencer) {
+                alert("No se pudieron verificar los cambios guardados. Comprueba que el navegador permita almacenamiento local.");
+                return;
+            }
+            cerrarModal("modalEditor");
+            alert("Cambios guardados correctamente.");
+        }
+
+        /* =====================================================
+           CATEGORÍAS
+        ====================================================== */
+
+        function mostrarCategorias() {
+            const contenedor = document.getElementById("categorias");
+            if (!contenedor) return;
+            contenedor.innerHTML = "";
+
+            // Las categorías se calculan desde los productos realmente guardados.
+            const inventario = obtenerProductosInventario();
+            const agrupadas = new Map();
+            inventario.forEach(producto => {
+                const categoria = String(
+                    producto.categoria || producto.nombreCategoria ||
+                    producto.tipoCategoria || producto.categoriaProducto || producto.tipo ||
+                    detectarCategoriaAutomatica(obtenerNombreProducto(producto))
+                ).trim() || detectarCategoriaAutomatica(obtenerNombreProducto(producto));
+                const cantidad = obtenerCantidadProducto(producto);
+                const clave = categoria.toLocaleLowerCase("es");
+                if (!agrupadas.has(clave)) agrupadas.set(clave, { nombre: categoria, cantidad: 0, productos: 0 });
+                const grupo = agrupadas.get(clave);
+                grupo.cantidad += cantidad;
+                grupo.productos += 1;
+            });
+
+            let categoriasVisibles = [...agrupadas.values()];
+
+            // No mostrar categorías de ejemplo cuando el inventario está vacío:
+            // todas las categorías visibles deben corresponder a productos registrados.
+
+            const maxCantidad = Math.max(1, ...categoriasVisibles.map(c => c.cantidad));
+
+            categoriasVisibles.forEach(categoria => {
+                const div = document.createElement("div");
+                div.className = "mb-4";
+                const fila = document.createElement("div");
+                fila.className = "flex justify-between items-center gap-2 text-sm mb-1";
+                const nombre = document.createElement("span");
+                nombre.className = "min-w-0 break-words";
+                nombre.textContent = categoria.nombre;
+                const cantidad = document.createElement("span");
+                cantidad.className = "text-gray-500 shrink-0";
+                cantidad.textContent = `${categoria.cantidad} unidades · ${categoria.productos} productos`;
+                fila.append(nombre, cantidad);
+                const barraFondo = document.createElement("div");
+                barraFondo.className = "h-3 bg-gray-100 rounded-full overflow-hidden";
+                const barra = document.createElement("div");
+                barra.className = "h-3 bg-purple-500 rounded-full transition-all";
+                barra.style.width = `${Math.max(0, Math.min(100, categoria.cantidad / maxCantidad * 100))}%`;
+                barraFondo.appendChild(barra);
+                div.append(fila, barraFondo);
+                contenedor.appendChild(div);
+            });
+            if (categoriasVisibles.length === 0) {
+                contenedor.textContent = "Todavía no hay productos registrados por categoría.";
+            }
+        }
+
+        function editarCategorias() {
+            const contenedor = document.getElementById("formCategorias");
+            if (!contenedor) return;
+            contenedor.innerHTML = "";
+
+            // Construir las categorías a partir del inventario real, no de datos de ejemplo.
+            const inventario = obtenerProductosInventario();
+            const grupos = new Map();
+            inventario.forEach(producto => {
+                const categoriaActual = String(
+                    producto.categoria || producto.nombreCategoria || producto.tipoCategoria ||
+                    producto.categoriaProducto || producto.tipo ||
+                    detectarCategoriaAutomatica(obtenerNombreProducto(producto))
+                ).trim() || "Otros alimentos";
+                const clave = categoriaActual.toLocaleLowerCase("es");
+                if (!grupos.has(clave)) grupos.set(clave, { nombre: categoriaActual, productos: 0, cantidad: 0 });
+                const grupo = grupos.get(clave);
+                grupo.productos += 1;
+                grupo.cantidad += obtenerCantidadProducto(producto);
+            });
+
+            const categorias = [...grupos.values()];
+            if (!categorias.length) {
+                const aviso = document.createElement("p");
+                aviso.className = "text-sm text-gray-500";
+                aviso.textContent = "Todavía no hay productos en el inventario para editar sus categorías.";
+                contenedor.appendChild(aviso);
+            }
+
+            categorias.forEach((categoria, indice) => {
+                const bloque = document.createElement("div");
+                bloque.className = "border rounded-lg p-3 mb-3";
+                const etiqueta = document.createElement("label");
+                etiqueta.className = "block text-sm font-semibold mb-2";
+                etiqueta.htmlFor = `catNombre${indice}`;
+                etiqueta.textContent = `Categoría actual: ${categoria.nombre}`;
+                const input = document.createElement("input");
+                input.id = `catNombre${indice}`;
+                input.type = "text";
+                input.value = categoria.nombre;
+                input.maxLength = 60;
+                input.className = "w-full border rounded-lg px-3 py-2";
+                input.dataset.categoriaOriginal = categoria.nombre;
+                input.setAttribute("aria-label", `Nuevo nombre para ${categoria.nombre}`);
+                const resumen = document.createElement("p");
+                resumen.className = "text-xs text-gray-500 mt-2";
+                resumen.textContent = `${categoria.productos} producto(s) · ${categoria.cantidad} unidades. El cambio se aplicará a todos los productos de esta categoría.`;
+
+                const acciones = document.createElement("div");
+                acciones.className = "flex justify-end mt-3";
+                const botonEliminar = document.createElement("button");
+                botonEliminar.type = "button";
+                botonEliminar.className = "px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50";
+                botonEliminar.textContent = "🗑️ Eliminar categoría y productos";
+                botonEliminar.addEventListener("click", () => {
+                    eliminarCategoria(categoria.nombre);
+                });
+                acciones.appendChild(botonEliminar);
+                bloque.append(etiqueta, input, resumen, acciones);
+                contenedor.appendChild(bloque);
+            });
+
+            document.getElementById("modalCategorias")?.classList.remove("hidden");
+        }
+
+        function guardarCategorias() {
+            const contenedor = document.getElementById("formCategorias");
+            if (!contenedor) return;
+            const inventario = obtenerProductosInventario();
+            const entradas = [...contenedor.querySelectorAll("input[data-categoria-original]")];
+            const cambios = new Map();
+
+            for (const entrada of entradas) {
+                const original = String(entrada.dataset.categoriaOriginal || "").trim();
+                const nuevo = String(entrada.value || "").trim();
+                if (!nuevo) {
+                    alert("Escribe un nombre para cada categoría antes de guardar.");
+                    entrada.focus();
+                    return;
+                }
+                cambios.set(original.toLocaleLowerCase("es"), { original, nuevo });
+            }
+
+            if (!inventario.length) {
+                cerrarModal("modalCategorias");
+                alert("No hay productos registrados para actualizar categorías.");
+                return;
+            }
+
+            inventario.forEach(producto => {
+                const actual = String(
+                    producto.categoria || producto.nombreCategoria || producto.tipoCategoria ||
+                    producto.categoriaProducto || producto.tipo ||
+                    detectarCategoriaAutomatica(obtenerNombreProducto(producto))
+                ).trim() || "Otros alimentos";
+                const cambio = cambios.get(actual.toLocaleLowerCase("es"));
+                if (!cambio) return;
+
+                // Actualizar el campo de categoría que ya utiliza el producto.
+                if (Object.prototype.hasOwnProperty.call(producto, "categoria")) producto.categoria = cambio.nuevo;
+                else if (Object.prototype.hasOwnProperty.call(producto, "nombreCategoria")) producto.nombreCategoria = cambio.nuevo;
+                else if (Object.prototype.hasOwnProperty.call(producto, "tipoCategoria")) producto.tipoCategoria = cambio.nuevo;
+                else if (Object.prototype.hasOwnProperty.call(producto, "categoriaProducto")) producto.categoriaProducto = cambio.nuevo;
+                else if (Object.prototype.hasOwnProperty.call(producto, "tipo")) producto.tipo = cambio.nuevo;
+                else producto.categoria = cambio.nuevo;
+            });
+
+            try {
+                guardarInventarioActualizado(inventario);
+                if (typeof guardarDatos === "function") guardarDatos();
+                if (typeof mostrarCategorias === "function") mostrarCategorias();
+                if (typeof actualizarPanel === "function") actualizarPanel();
+                cerrarModal("modalCategorias");
+                alert("Categorías guardadas. Los productos del inventario y el panel ya muestran los nombres actualizados.");
+            } catch (error) {
+                console.error("No se pudieron guardar las categorías:", error);
+                alert("No se pudieron guardar los cambios. Comprueba que el navegador permita el almacenamiento local.");
+            }
+        }
+
+
+        /* =====================================================
+           OBTENER PRODUCTOS DEL INVENTARIO
+        ====================================================== */
+
+        function esListaDeProductos(valor) {
+            if (!Array.isArray(valor)) return false;
+            if (valor.length === 0) return true;
+            return valor.some(item => item && typeof item === "object" && (
+                "nombre" in item || "producto" in item || "nombreProducto" in item ||
+                "nombre_producto" in item || "descripcion" in item || "categoria" in item ||
+                "cantidad" in item || "stock" in item
+            ));
+        }
+
+        function clavesDeInventario() {
+            const preferidas = ["productosInventario", "inventarioProductos", "productos", "inventario", "listaProductos"];
+            const encontradas = [];
+            for (const clave of preferidas) {
+                const bruto = localStorage.getItem(clave);
+                if (bruto !== null) {
+                    try { if (esListaDeProductos(JSON.parse(bruto))) encontradas.push(clave); } catch (_) {}
+                }
+            }
+            // Compatibilidad con otras páginas del mismo proyecto que hayan usado otro nombre de clave.
+            for (let i = 0; i < localStorage.length; i++) {
+                const clave = localStorage.key(i);
+                if (!clave || encontradas.includes(clave) || /cuenta/i.test(clave) || !/(producto|inventario|alimento)/i.test(clave)) continue;
+                try {
+                    const valor = JSON.parse(localStorage.getItem(clave));
+                    if (esListaDeProductos(valor)) encontradas.push(clave);
+                } catch (_) {}
+            }
+            return encontradas;
+        }
+
+        function obtenerProductosInventario() {
+            const claves = clavesDeInventario();
+            // La clave principal del proyecto tiene prioridad.
+            if (!claves.length) return [];
+            const principal = claves.includes("productosInventario") ? "productosInventario" : claves[0];
+            try {
+                const productos = JSON.parse(localStorage.getItem(principal) || "[]");
+                return Array.isArray(productos) ? productos : [];
+            } catch (error) {
+                console.error("No se pudieron leer los productos:", error);
+                return [];
+            }
+        }
+
+        function guardarInventarioActualizado(productosFiltrados) {
+            const datosInventario = JSON.stringify(productosFiltrados);
+
+            // Esta es la fuente principal y permanente del inventario.
+            localStorage.setItem("productosInventario", datosInventario);
+
+            // Mantener sincronizadas las demás claves compatibles del proyecto.
+            const claves = clavesDeInventario();
+            claves.filter(clave => clave !== "productosInventario")
+                .forEach(clave => localStorage.setItem(clave, datosInventario));
+        }
+
+
+        /* =====================================================
+           NOMBRE DEL PRODUCTO
+        ====================================================== */
+
+        function obtenerNombreProducto(producto) {
+
+            return (
+                producto.nombre ||
+                producto.producto ||
+                producto.descripcion ||
+                producto.nombreProducto ||
+                producto.nombre_producto ||
+                "Producto"
+            );
+
+        }
+
+
+        /* =====================================================
+           CANTIDAD DEL PRODUCTO
+        ====================================================== */
+
+        function obtenerCantidadProducto(producto) {
+
+            const posiblesCantidades = [
+
+                producto.cantidad,
+
+                producto.stock,
+
+                producto.cantidadStock,
+
+                producto.cantidadProducto,
+
+                producto.unidades,
+
+                producto.cantidadDisponible,
+
+                producto.stockActual
+
+            ];
+
+
+            for (
+                let i = 0;
+                i < posiblesCantidades.length;
+                i++
+            ) {
+
+                const valor =
+                    posiblesCantidades[i];
+
+
+                if (
+                    valor !== undefined &&
+                    valor !== null &&
+                    valor !== ""
+                ) {
+
+                    const numero =
+                        parseFloat(valor);
+
+
+                    if (!isNaN(numero)) {
+
+                        return numero;
+
+                    }
+
+                }
+
+            }
+
+
+            return 0;
+
+        }
+
+
+        /* =====================================================
+           STOCK MÍNIMO
+        ====================================================== */
+
+        function obtenerStockMinimo(producto) {
+
+            const posiblesMinimos = [
+
+                producto.stockMinimo,
+
+                producto.minimo,
+
+                producto.stock_minimo,
+
+                producto.minimoStock,
+
+                producto.stockMin
+
+            ];
+
+
+            for (
+                let i = 0;
+                i < posiblesMinimos.length;
+                i++
+            ) {
+
+                const valor =
+                    posiblesMinimos[i];
+
+
+                if (
+                    valor !== undefined &&
+                    valor !== null &&
+                    valor !== ""
+                ) {
+
+                    const numero =
+                        parseFloat(valor);
+
+
+                    if (!isNaN(numero)) {
+
+                        return numero;
+
+                    }
+
+                }
+
+            }
+
+
+            /* Mínimo predeterminado */
+
+            return 5;
+
+        }
+
+
+        /* =====================================================
+           OBTENER FECHA DE VENCIMIENTO
+        ====================================================== */
+
+        function obtenerFechaVencimiento(producto) {
+
+            return (
+                producto.vencimiento ||
+                producto.fechaVencimiento ||
+                producto.fecha_vencimiento ||
+                producto.fechaCaducidad ||
+                producto.caducidad ||
+                producto.expiracion ||
+                producto.fechaExpiracion ||
+                ""
+            );
+
+        }
+
+
+        /* =====================================================
+           CONVERTIR FECHA
+        ====================================================== */
+
+        function convertirFecha(fecha) {
+
+            if (!fecha) {
+                return null;
+            }
+
+            const texto = String(fecha).trim();
+            let coincidencia;
+
+            // YYYY-MM-DD
+            coincidencia = texto.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+            if (coincidencia) {
+                const anio = Number(coincidencia[1]);
+                const mes = Number(coincidencia[2]);
+                const dia = Number(coincidencia[3]);
+                const fechaLocal = new Date(anio, mes - 1, dia);
+
+                if (fechaLocal.getFullYear() === anio &&
+                    fechaLocal.getMonth() === mes - 1 &&
+                    fechaLocal.getDate() === dia) {
+                    fechaLocal.setHours(0, 0, 0, 0);
+                    return fechaLocal;
+                }
+                return null;
+            }
+
+            // DD/MM/YYYY o DD-MM-YYYY
+            coincidencia = texto.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+
+            if (coincidencia) {
+                const dia = Number(coincidencia[1]);
+                const mes = Number(coincidencia[2]);
+                const anio = Number(coincidencia[3]);
+                const fechaLocal = new Date(anio, mes - 1, dia);
+
+                if (fechaLocal.getFullYear() === anio &&
+                    fechaLocal.getMonth() === mes - 1 &&
+                    fechaLocal.getDate() === dia) {
+                    fechaLocal.setHours(0, 0, 0, 0);
+                    return fechaLocal;
+                }
+                return null;
+            }
+
+            return null;
+        }
+
+
+        /* =====================================================
+           DÍAS HASTA VENCIMIENTO
+        ====================================================== */
+
+        function diasParaVencer(fecha) {
+
+            const fechaVencimiento =
+                convertirFecha(fecha);
+
+
+            if (!fechaVencimiento) {
+                return null;
+            }
+
+
+            const hoy =
+                new Date();
+
+
+            hoy.setHours(
+                0,
+                0,
+                0,
+                0
+            );
+
+
+            fechaVencimiento.setHours(
+                0,
+                0,
+                0,
+                0
+            );
+
+
+            const diferencia =
+                fechaVencimiento.getTime() -
+                hoy.getTime();
+
+
+            return Math.ceil(
+                diferencia /
+                (1000 * 60 * 60 * 24)
+            );
+
+        }
+
+
+        /* =====================================================
+           CREAR ALERTAS AUTOMÁTICAS
+        ====================================================== */
+
+        function generarAlertasAutomaticas() {
+
+            const productos =
+                obtenerProductosInventario();
+
+
+            const alertasAutomaticas = [];
+
+
+            productos.forEach(
+                producto => {
+
+                    const nombre =
+                        obtenerNombreProducto(
+                            producto
+                        );
+
+
+                    const cantidad =
+                        obtenerCantidadProducto(
+                            producto
+                        );
+
+
+                    const stockMinimo =
+                        obtenerStockMinimo(
+                            producto
+                        );
+
+
+                    /*
+                     * ALERTA DE STOCK
+                     *
+                     * Se activa cuando la cantidad
+                     * es menor o igual al mínimo.
+                     */
+
+                    if (
+                        cantidad <=
+                        stockMinimo
+                    ) {
+
+                        alertasAutomaticas.push({
+
+                            nombre:
+                                nombre,
+
+                            tipo:
+                                "stock",
+
+                            mensaje:
+                                `Stock bajo: ${cantidad} unidades disponibles.`
+
+                        });
+
+                    }
+
+
+                    /*
+                     * ALERTA DE VENCIMIENTO
+                     */
+
+                    const fecha =
+                        obtenerFechaVencimiento(
+                            producto
+                        );
+
+
+                    if (fecha) {
+
+                        const dias =
+                            diasParaVencer(
+                                fecha
+                            );
+
+
+                        /*
+                         * Ya venció
+                         */
+
+                        if (
+                            dias !== null &&
+                            dias < 0
+                        ) {
+
+                            alertasAutomaticas.push({
+
+                                nombre:
+                                    nombre,
+
+                                tipo:
+                                    "vencido",
+
+                                mensaje:
+                                    `Producto vencido desde hace ${Math.abs(dias)} día(s).`
+
+                            });
+
+                        }
+
+
+                        /*
+                         * Vence hoy
+                         */
+
+                        else if (
+                            dias === 0
+                        ) {
+
+                            alertasAutomaticas.push({
+
+                                nombre:
+                                    nombre,
+
+                                tipo:
+                                    "hoy",
+
+                                mensaje:
+                                    "El producto vence hoy."
+
+                            });
+
+                        }
+
+
+                        /*
+                         * Vence dentro de 7 días
+                         */
+
+                        else if (
+                            dias > 0 &&
+                            dias <= 7
+                        ) {
+
+                            alertasAutomaticas.push({
+
+                                nombre:
+                                    nombre,
+
+                                tipo:
+                                    "vencimiento",
+
+                                mensaje:
+                                    `Vence en ${dias} día(s).`
+
+                            });
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            return alertasAutomaticas;
+
+        }
+
+
+        /* =====================================================
+           MOSTRAR ALERTAS
+        ====================================================== */
+
+        function mostrarAlertas() {
+
+            const contenedor =
+                document.getElementById(
+                    "listaAlertas"
+                );
+
+
+            contenedor.innerHTML = "";
+
+
+            const alertasAutomaticas =
+                generarAlertasAutomaticas();
+
+
+            /*
+             * Si hay productos del inventario,
+             * mostramos las alertas reales.
+             */
+
+            if (
+                alertasAutomaticas.length > 0
+            ) {
+
+                alertasAutomaticas.forEach(
+                    alerta => {
+
+                        const div =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        let clase =
+                            "border rounded-lg px-4 py-3";
+
+
+                        let icono =
+                            "⚠️";
+
+
+                        let color =
+                            "text-orange-600";
+
+
+                        if (
+                            alerta.tipo ===
+                            "stock"
+                        ) {
+
+                            icono = "🔴";
+
+                            color =
+                                "text-red-600";
+
+                        }
+
+
+                        if (
+                            alerta.tipo ===
+                            "vencido"
+                        ) {
+
+                            icono = "❌";
+
+                            color =
+                                "text-red-700";
+
+                        }
+
+
+                        if (
+                            alerta.tipo ===
+                            "hoy"
+                        ) {
+
+                            icono = "🚨";
+
+                            color =
+                                "text-red-600";
+
+                        }
+
+
+                        if (
+                            alerta.tipo ===
+                            "vencimiento"
+                        ) {
+
+                            icono = "📅";
+
+                            color =
+                                "text-orange-600";
+
+                        }
+
+
+                        div.className =
+                            clase;
+
+
+                        div.innerHTML = `
+
+                            <div class="flex items-start gap-3">
+
+                                <span class="text-lg">
+                                    ${icono}
+                                </span>
+
+                                <div>
+
+                                    <p class="font-semibold ${color}">
+                                        ${alerta.nombre}
+                                    </p>
+
+                                    <p class="text-xs text-gray-500">
+                                        ${alerta.mensaje}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+
+                        contenedor.appendChild(
+                            div
+                        );
+
+                    }
+                );
+
+
+                return;
+
+            }
+
+
+            /*
+             * Si hay productos guardados pero ninguno
+             * genera alerta, mostrar el estado real
+             * del inventario y no alertas antiguas.
+             */
+
+            if (obtenerProductosInventario().length > 0) {
+
+                contenedor.innerHTML = `
+                    <p class="text-sm text-green-600">
+                        ✅ No hay alertas de inventario.
+                    </p>
+                `;
+
+                return;
+            }
+
+            /*
+             * Si todavía no hay productos reales,
+             * usar las alertas manuales del panel.
+             */
+
+            if (
+                datos.alertas.length === 0
+            ) {
+
+                contenedor.innerHTML = `
+
+                    <p class="text-sm text-gray-500">
+
+                        ✅ No hay alertas.
+
+                    </p>
+
+                `;
+
+                return;
+
+            }
+
+
+            datos.alertas.forEach(
+                alerta => {
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.className =
+                        "border rounded-lg px-4 py-3 flex items-center gap-2";
+
+
+                    div.innerHTML = `
+
+                        <span>
+                            ⚠️
+                        </span>
+
+                        <span>
+                            ${alerta}
+                        </span>
+
+                    `;
+
+
+                    contenedor.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           EDITAR ALERTAS MANUALES
+        ====================================================== */
+
+        function editarAlertas() {
+
+            const contenedor =
+                document.getElementById(
+                    "formAlertas"
+                );
+
+
+            contenedor.innerHTML = "";
+
+
+            datos.alertas.forEach(
+                alerta => {
+
+                    agregarCampoAlerta(
+                        alerta
+                    );
+
+                }
+            );
+
+
+            document.getElementById(
+                "modalAlertas"
+            ).classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        function agregarCampoAlerta(
+            valor = ""
+        ) {
+
+            const contenedor =
+                document.getElementById(
+                    "formAlertas"
+                );
+
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "flex gap-2";
+
+
+            div.innerHTML = `
+
+                <input
+                    value="${valor}"
+                    class="campoAlerta flex-1
+                           border rounded-lg
+                           px-3 py-2"
+                    placeholder="Nombre del producto">
+
+
+                <button
+                    type="button"
+                    onclick="this.parentElement.remove()"
+                    class="px-3 py-2
+                           bg-red-100
+                           text-red-600
+                           rounded-lg">
+
+                    🗑️
+
+                </button>
+
+            `;
+
+
+            contenedor.appendChild(
+                div
+            );
+
+        }
+
+
+        function guardarAlertas() {
+
+            const campos =
+                document.querySelectorAll(
+                    ".campoAlerta"
+                );
+
+
+            datos.alertas = [];
+
+
+            campos.forEach(
+                campo => {
+
+                    const valor =
+                        campo.value.trim();
+
+
+                    if (valor !== "") {
+
+                        datos.alertas.push(
+                            valor
+                        );
+
+                    }
+
+                }
+            );
+
+
+            guardarDatos();
+
+            actualizarPanel();
+
+            cerrarModal(
+                "modalAlertas"
+            );
+
+
+            alert(
+                "✅ Alertas actualizadas."
+            );
+
+        }
+
+
+        /* =====================================================
+           ELIMINAR ELEMENTOS Y SINCRONIZAR EL INVENTARIO
+        ====================================================== */
+
+        function leerProductosGuardados() {
+            try {
+                const guardados = JSON.parse(localStorage.getItem("productosInventario") || "[]");
+                return Array.isArray(guardados) ? guardados : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function guardarProductosGuardados(productos) {
+            localStorage.setItem("productosInventario", JSON.stringify(productos));
+        }
+
+        function seleccionarProductoParaEliminar() {
+            const inventario = obtenerProductosInventario();
+            const nombresInventario = inventario.map(p => String(obtenerNombreProducto(p) || "").trim()).filter(Boolean);
+            const nombresPanel = (datos.actividades || []).map(a => String(a.nombre || a.producto || a.nombreProducto || a.descripcion || "").trim()).filter(Boolean);
+            const nombresGrafica = (datos.grafica || []).map(p => String(p.nombre || p.producto || "").trim()).filter(Boolean);
+            const lista = [...new Set([...nombresInventario, ...nombresPanel, ...nombresGrafica])];
+            if (!lista.length) {
+                alert("No hay productos registrados para eliminar.");
+                return;
+            }
+            const opciones = lista.map((nombre, i) => `${i + 1}. ${nombre}`).join("\n");
+            const respuesta = prompt("ELIMINAR PRODUCTO\n\nEscribe el número del producto que deseas eliminar:\n\n" + opciones);
+            if (respuesta === null) return;
+            const indice = Number(String(respuesta).trim()) - 1;
+            if (!Number.isInteger(indice) || indice < 0 || indice >= lista.length) {
+                alert("Número no válido. Elige uno de los productos de la lista.");
+                return;
+            }
+            eliminarProductoDesdeActividad(lista[indice]);
+        }
+
+        function eliminarProductoDesdeActividad(nombre) {
+            const normalizar = valor => String(valor ?? "").trim().toLocaleLowerCase("es");
+            const nombreNormalizado = normalizar(nombre);
+            if (!nombreNormalizado) return;
+            if (!confirm(`¿Seguro que deseas eliminar “${nombre}”? Se quitará del inventario, la gráfica, las categorías, la actividad y las alertas.`)) return;
+
+            const productos = obtenerProductosInventario();
+            const productosFiltrados = productos.filter(producto => normalizar(obtenerNombreProducto(producto)) !== nombreNormalizado);
+            guardarInventarioActualizado(productosFiltrados);
+
+            const coincide = item => normalizar(typeof item === "string" ? item : (item.nombre || item.producto || item.nombreProducto || item.descripcion)) !== nombreNormalizado;
+            datos.actividades = (datos.actividades || []).filter(coincide);
+            datos.grafica = (datos.grafica || []).filter(coincide);
+            datos.alertas = (datos.alertas || []).filter(coincide);
+            datos.productos = productosFiltrados.length;
+            guardarDatos();
+
+            // Redibujar todas las partes relacionadas y refrescar el contador.
+            actualizarPanel();
+            mostrarActividades();
+            mostrarGrafica();
+            mostrarCategorias();
+            if (typeof mostrarAlertas === "function") mostrarAlertas();
+            alert(`Producto “${nombre}” eliminado del panel. Productos restantes: ${productosFiltrados.length}.`);
+        }
+
+        function eliminarProducto(nombre) {
+            eliminarProductoDesdeActividad(nombre);
+        }
+
+        
+        function eliminarCategoria(nombreCategoria) {
+            const normalizar = valor => String(valor ?? "").trim().toLocaleLowerCase("es");
+            const categoriaNormalizada = normalizar(nombreCategoria);
+            if (!categoriaNormalizada) return;
+            if (!confirm(`¿Eliminar la categoría “${nombreCategoria}” y los productos asociados? Esta acción no se puede deshacer.`)) return;
+
+            const productos = obtenerProductosInventario();
+            const perteneceCategoria = producto => normalizar(
+                producto.categoria || producto.nombreCategoria || producto.tipoCategoria ||
+                producto.categoriaProducto || producto.tipo ||
+                detectarCategoriaAutomatica(obtenerNombreProducto(producto))
+            ) === categoriaNormalizada;
+            const productosQuitados = productos.filter(perteneceCategoria);
+            const productosFiltrados = productos.filter(producto => !perteneceCategoria(producto));
+            guardarInventarioActualizado(productosFiltrados);
+
+            const nombresQuitados = new Set(productosQuitados.map(producto => normalizar(obtenerNombreProducto(producto))));
+            datos.categorias = (datos.categorias || []).filter(categoria => normalizar(categoria.nombre) !== categoriaNormalizada);
+            datos.actividades = (datos.actividades || []).filter(item => {
+                const nombre = normalizar(item.nombre || item.producto || item.nombreProducto || item.descripcion);
+                const categoria = normalizar(item.categoria || item.nombreCategoria || item.tipoCategoria || item.categoriaProducto || item.tipo);
+                return !nombresQuitados.has(nombre) && categoria !== categoriaNormalizada;
+            });
+            datos.grafica = (datos.grafica || []).filter(item => {
+                const nombre = normalizar(item.nombre || item.producto || item.nombreProducto || item.descripcion);
+                const categoria = normalizar(item.categoria || item.nombreCategoria || item.tipoCategoria || item.categoriaProducto || item.tipo);
+                return !nombresQuitados.has(nombre) && categoria !== categoriaNormalizada;
+            });
+            datos.alertas = (datos.alertas || []).filter(item => {
+                const nombre = typeof item === "string" ? normalizar(item) : normalizar(item.nombre || item.producto || item.nombreProducto || item.descripcion);
+                const categoria = typeof item === "string" ? "" : normalizar(item.categoria || item.nombreCategoria || item.tipoCategoria || item.categoriaProducto || item.tipo);
+                return !nombresQuitados.has(nombre) && categoria !== categoriaNormalizada;
+            });
+
+            guardarDatos();
+            actualizarPanel();
+            mostrarCategorias();
+            mostrarActividades();
+            if (typeof mostrarGrafica === "function") mostrarGrafica();
+            if (typeof mostrarAlertas === "function") mostrarAlertas();
+            cerrarModal("modalCategorias");
+            alert(`Se eliminó la categoría “${nombreCategoria}” y ${productosQuitados.length} producto(s) asociados. Los productos se quitaron de las listas de inventario compatibles de este navegador.`);
+        }
+
+
+        /* =====================================================
+           ACTIVIDADES
+        ====================================================== */
+
+        function leerListaGuardada(clave) {
+            try {
+                const lista = JSON.parse(localStorage.getItem(clave) || "[]");
+                return Array.isArray(lista) ? lista : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function marcaDeTiempo(fecha, hora, respaldo) {
+            if (fecha) {
+                const t = new Date(String(fecha) + "T" + (hora || "00:00")).getTime();
+                if (!isNaN(t)) return t;
+            }
+            return respaldo || 0;
+        }
+
+        function mostrarActividades() {
+
+            const contenedor =
+                document.getElementById(
+                    "listaActividad"
+                );
+
+
+            contenedor.innerHTML = "";
+
+
+            const normalizar = v => String(v ?? "").trim().toLocaleLowerCase("es");
+            const nombresInventario = new Set(
+                obtenerProductosInventario().map(p => normalizar(obtenerNombreProducto(p)))
+            );
+
+            const lista = [];
+
+            datos.actividades.forEach((a, i) => {
+                lista.push({
+                    nombre: a.nombre,
+                    cantidad: a.cantidad,
+                    detalle: "Actualizado recientemente",
+                    ts: a.fechaHora || 0,
+                    orden: -i
+                });
+            });
+
+            leerListaGuardada("entradasEscolar").forEach(e => {
+                if (e.origen === "panel") return;
+                const nombre = e.producto || e.nombre || "";
+                if (!nombresInventario.has(normalizar(nombre))) return;
+                const respaldo = Number(String(e.id || "").replace(/\D/g, "")) || 0;
+                lista.push({
+                    nombre: nombre,
+                    cantidad: e.cantidad,
+                    detalle: "Entrada · " + (e.fecha || "") + (e.hora ? " " + e.hora : ""),
+                    ts: marcaDeTiempo(e.fecha, e.hora, respaldo),
+                    orden: 0
+                });
+            });
+
+            leerListaGuardada("entradas").forEach(e => {
+                const nombre = e.nombre || "";
+                if (!nombresInventario.has(normalizar(nombre))) return;
+                lista.push({
+                    nombre: nombre,
+                    cantidad: "+" + (e.cantidad ?? "") + " " + (e.unidad || ""),
+                    detalle: "Entrada · " + (e.fecha || ""),
+                    ts: marcaDeTiempo(e.fecha, e.hora, 0),
+                    orden: 0
+                });
+            });
+
+            leerListaGuardada("salidas").forEach(s => {
+                const nombre = s.nombre || "";
+                if (!nombresInventario.has(normalizar(nombre))) return;
+                lista.push({
+                    nombre: nombre,
+                    cantidad: "-" + (s.cantidad ?? "") + " " + (s.unidad || ""),
+                    detalle: "Salida · " + (s.fecha || ""),
+                    ts: marcaDeTiempo(s.fecha, s.hora, 0),
+                    orden: 0
+                });
+            });
+
+            lista.sort((a, b) => (b.ts - a.ts) || (b.orden - a.orden));
+
+
+            lista.filter(item => item.nombre).slice(0, 5).forEach(
+                actividad => {
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.className =
+                        "flex justify-between items-start gap-3 border-b pb-3";
+
+                    const nombreSeguro = String(actividad.nombre || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const cantidadSegura = String(actividad.cantidad ?? "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const detalleSeguro = String(actividad.detalle || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    div.innerHTML = `
+                        <div class="min-w-0 flex-1">
+                            <p class="font-medium text-sm break-words">🟣 ${nombreSeguro}</p>
+                            <p class="text-xs text-gray-400">${detalleSeguro}</p>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <strong class="text-sm">${cantidadSegura}</strong>
+                        </div>
+                    `;
+
+
+                    contenedor.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           ASIGNAR CATEGORÍA AUTOMÁTICAMENTE SEGÚN EL ALIMENTO
+        ====================================================== */
+        function detectarCategoriaAutomatica(nombreProducto) {
+            const nombre = String(nombreProducto || "").toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const reglas = [
+                { categoria: "Verduras y hortalizas", palabras: ["papa", "papas", "tomate", "cebolla", "zanahoria", "lechuga", "pepino", "repollo", "chile", "ajo", "yuca", "brocoli", "coliflor", "espinaca", "ayote", "guisquil"] },
+                { categoria: "Frutas", palabras: ["manzana", "banano", "banana", "platano", "naranja", "limon", "papaya", "piña", "pina", "mango", "sandia", "melon", "uva", "fresa", "pera", "aguacate"] },
+                { categoria: "Granos y cereales", palabras: ["avena", "arroz", "maiz", "frijol", "frijoles", "lenteja", "lentejas", "garbanzo", "trigo", "harina", "pasta", "espagueti", "cereal", "cebada"] },
+                { categoria: "Lácteos", palabras: ["leche", "queso", "crema", "yogur", "yogurt", "mantequilla", "requeson"] },
+                { categoria: "Carnes y huevos", palabras: ["pollo", "res", "carne", "cerdo", "pescado", "atun", "jamon", "salchicha", "huevo", "huevos"] },
+                { categoria: "Aceites y condimentos", palabras: ["aceite", "sal", "azucar", "pimienta", "canela", "comino", "oregano", "vinagre", "mayonesa", "salsa"] },
+                { categoria: "Enlatados y otros", palabras: ["atun en lata", "sardina", "conserva", "enlatado", "galleta", "pan", "jugo", "agua", "refresco"] }
+            ];
+            for (const regla of reglas) {
+                if (regla.palabras.some(palabra => nombre.includes(palabra.normalize("NFD").replace(/[\u0300-\u036f]/g, "")))) {
+                    return regla.categoria;
+                }
+            }
+            return "Otros alimentos";
+        }
+
+        /* =====================================================
+           AGREGAR ACTIVIDAD Y GRÁFICA
+        ====================================================== */
+
+        function generarCodigoProducto(inventario) {
+            let maxNumero = 0;
+
+            inventario.forEach(producto => {
+                const codigo = String(producto.codigo || "").trim().toUpperCase();
+                const coincidencia = codigo.match(/^P(\d+)$/);
+
+                if (coincidencia) {
+                    const numero = Number(coincidencia[1]);
+                    if (!isNaN(numero) && numero > maxNumero) {
+                        maxNumero = numero;
+                    }
+                }
+            });
+
+            return "P" + String(maxNumero + 1).padStart(3, "0");
+        }
+
+        function agregarActividad() {
+            const nombreIngresado = prompt("Nombre del producto:");
+            if (!nombreIngresado || !nombreIngresado.trim()) return;
+            const nombre = nombreIngresado.trim();
+
+            const cantidadIngresada = prompt("Cantidad (por ejemplo: 10 libras o 20 unidades):");
+            if (!cantidadIngresada || !cantidadIngresada.trim()) return;
+
+            const fechaVencimiento = prompt("Fecha de vencimiento (DD/MM/AAAA):");
+            if (!fechaVencimiento || !fechaVencimiento.trim()) return;
+
+            const ubicacionIngresada = prompt("Ubicación del producto:");
+            if (!ubicacionIngresada || !ubicacionIngresada.trim()) return;
+            const ubicacion = ubicacionIngresada.trim();
+
+            const fechaValida = convertirFecha(fechaVencimiento.trim());
+            if (!fechaValida) {
+                alert("⚠️ La fecha de vencimiento no es válida.");
+                return;
+            }
+
+            const cantidadTexto = cantidadIngresada.trim();
+            const coincidencia = cantidadTexto.replace(",", ".").match(/-?\d+(?:\.\d+)?/);
+            const cantidadNumerica = coincidencia ? Math.max(0, Number(coincidencia[0])) : 1;
+            const categoria = detectarCategoriaAutomatica(nombre);
+            const inventario = obtenerProductosInventario();
+            const normalizar = valor => String(valor || "").trim().toLocaleLowerCase("es");
+            const existente = inventario.find(p => normalizar(obtenerNombreProducto(p)) === normalizar(nombre));
+
+            if (existente) {
+                const cantidadActual = obtenerCantidadProducto(existente);
+                existente.cantidad = cantidadActual + cantidadNumerica;
+                existente.categoria = existente.categoria || categoria;
+                existente.vencimiento = fechaVencimiento.trim();
+                existente.ubicacion = ubicacion;
+                if (cantidadTexto.match(/[a-záéíóúñ]/i)) existente.unidad = cantidadTexto.replace(/^[\d.,\s-]+/, "").trim() || existente.unidad || "";
+                if (!existente.codigo || !/^P\d+$/i.test(String(existente.codigo).trim())) existente.codigo = generarCodigoProducto(inventario);
+            } else {
+                inventario.push({
+                    nombre: nombre,
+                    cantidad: cantidadNumerica,
+                    unidad: cantidadTexto.replace(/^[\d.,\s-]+/, "").trim(),
+                    categoria: categoria,
+                    vencimiento: fechaVencimiento.trim(),
+                    ubicacion: ubicacion,
+                    codigo: generarCodigoProducto(inventario)
+                });
+            }
+            guardarInventarioActualizado(inventario);
+
+            const aISO = f =>
+                f.getFullYear() + "-" +
+                String(f.getMonth() + 1).padStart(2, "0") + "-" +
+                String(f.getDate()).padStart(2, "0");
+            const ahora = new Date();
+            const cuentaActual = obtenerCuentaActiva();
+            const registrosEntradas = leerListaGuardada("entradasEscolar");
+            registrosEntradas.unshift({
+                id: "entrada-" + Date.now(),
+                producto: nombre,
+                categoria: categoria,
+                cantidad: cantidadTexto,
+                cantidadNumero: cantidadNumerica,
+                fecha: aISO(ahora),
+                hora: String(ahora.getHours()).padStart(2, "0") + ":" + String(ahora.getMinutes()).padStart(2, "0"),
+                proveedor: "Ministerio de Educación",
+                responsable: cuentaActual ? cuentaActual.nombre : "",
+                ubicacion: ubicacion,
+                vencimiento: aISO(fechaValida),
+                origen: "panel"
+            });
+            localStorage.setItem("entradasEscolar", JSON.stringify(registrosEntradas));
+
+            datos.actividades.unshift({ nombre: nombre, cantidad: cantidadTexto, fechaHora: Date.now() });
+            datos.actividades = datos.actividades.slice(0, 5);
+
+            const indiceExistente = datos.grafica.findIndex(producto =>
+                normalizar(producto.nombre) === normalizar(nombre)
+            );
+            if (indiceExistente >= 0) {
+                datos.grafica[indiceExistente].cantidad = cantidadNumerica;
+            } else {
+                datos.grafica.push({ nombre: nombre, cantidad: cantidadNumerica, categoria: categoria });
+            }
+            datos.grafica = datos.grafica.slice(0, 10);
+
+            guardarDatos();
+            actualizarPanel();
+            alert("✅ Producto guardado en el inventario. Categoría asignada automáticamente: " + categoria + ".");
+        }
+
+        /* =====================================================
+           SINCRONIZAR PRODUCTOS CON GRÁFICA
+        ====================================================== */
+
+        function sincronizarProductosConGrafica() {
+
+            const productos =
+                obtenerProductosInventario();
+
+
+            if (!Array.isArray(productos) || productos.length === 0) {
+                datos.grafica = [];
+                guardarDatos();
+                return;
+            }
+
+
+            const nuevaGrafica = [];
+
+
+            productos.forEach(
+                producto => {
+
+                    const nombre =
+                        obtenerNombreProducto(
+                            producto
+                        );
+
+
+                    const cantidad =
+                        obtenerCantidadProducto(
+                            producto
+                        );
+
+
+                    if (!nombre) {
+                        return;
+                    }
+
+
+                    const existente =
+                        nuevaGrafica.find(
+                            item =>
+                                item.nombre.toLowerCase() ===
+                                nombre.toLowerCase()
+                        );
+
+
+                    if (existente) {
+
+                        existente.cantidad =
+                            cantidad;
+
+                    } else {
+
+                        nuevaGrafica.push({
+
+                            nombre:
+                                nombre,
+
+                            cantidad:
+                                cantidad
+
+                        });
+
+                    }
+
+                }
+            );
+
+
+            if (
+                nuevaGrafica.length > 0
+            ) {
+
+                datos.grafica =
+                    nuevaGrafica;
+
+                guardarDatos();
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MOSTRAR GRÁFICA
+        ====================================================== */
+
+        function mostrarGrafica() {
+            sincronizarProductosConGrafica();
+            const contenedor = document.getElementById("grafica");
+            if (!contenedor) return;
+            contenedor.innerHTML = "";
+
+            const inventario = obtenerProductosInventario();
+            const productosGrafica = (inventario.length > 0
+                ? inventario.map(producto => ({
+                    nombre: obtenerNombreProducto(producto),
+                    cantidad: obtenerCantidadProducto(producto)
+                }))
+                : (datos.grafica || []))
+                .filter(producto => producto && producto.nombre);
+
+            if (!productosGrafica.length) {
+                contenedor.className = "relative w-full";
+                contenedor.style.height = "300px";
+                contenedor.innerHTML = `<div class="w-full h-full flex items-center justify-center"><p class="text-sm text-gray-400">No hay productos en el inventario.</p></div>`;
+                return;
+            }
+
+            const cantidades = productosGrafica.map(p => Math.max(0, Number(p.cantidad) || 0));
+            const maxCantidad = Math.max(...cantidades, 10);
+            const paso = 10;
+            const maxEje = Math.max(10, Math.ceil(maxCantidad / paso) * paso);
+            const colores = ["#3b82f6", "#8b5cf6", "#fb923c", "#eab308", "#ef4444", "#22c55e", "#ec4899", "#6366f1", "#06b6d4", "#14b8a6"];
+
+            // Eje, líneas y barras se dibujan en un mismo SVG y comparten
+            // exactamente la misma conversión de valor a coordenada vertical.
+            const alto = 300;
+            const anchoColumna = 86;
+            const ancho = Math.max(420, 58 + productosGrafica.length * anchoColumna);
+            const margen = { arriba: 22, derecha: 18, abajo: 58, izquierda: 42 };
+            const altoPlot = alto - margen.arriba - margen.abajo;
+            const anchoPlot = ancho - margen.izquierda - margen.derecha;
+            const y = valor => margen.arriba + altoPlot - (valor / maxEje) * altoPlot;
+            const xCentro = i => margen.izquierda + ((i + 0.5) * anchoPlot / productosGrafica.length);
+            const ns = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(ns, "svg");
+            svg.setAttribute("width", ancho);
+            svg.setAttribute("height", alto);
+            svg.setAttribute("viewBox", `0 0 ${ancho} ${alto}`);
+            svg.setAttribute("role", "img");
+            svg.setAttribute("aria-label", "Gráfica de cantidades de productos");
+            svg.style.cssText = "display:block;max-width:none;height:300px;";
+
+            for (let valor = 0; valor <= maxEje; valor += paso) {
+                const yy = y(valor);
+                const linea = document.createElementNS(ns, "line");
+                linea.setAttribute("x1", margen.izquierda);
+                linea.setAttribute("x2", ancho - margen.derecha);
+                linea.setAttribute("y1", yy);
+                linea.setAttribute("y2", yy);
+                linea.setAttribute("stroke", "#d1d5db");
+                linea.setAttribute("stroke-width", valor === 0 ? "1.4" : "1");
+                if (valor !== 0) linea.setAttribute("stroke-dasharray", "4 4");
+                svg.appendChild(linea);
+
+                const texto = document.createElementNS(ns, "text");
+                texto.textContent = valor;
+                texto.setAttribute("x", margen.izquierda - 9);
+                texto.setAttribute("y", yy);
+                texto.setAttribute("text-anchor", "end");
+                texto.setAttribute("dominant-baseline", "middle");
+                texto.setAttribute("font-size", "11");
+                texto.setAttribute("fill", "#6b7280");
+                svg.appendChild(texto);
+            }
+
+            productosGrafica.forEach((producto, indice) => {
+                const cantidad = Math.max(0, Number(producto.cantidad) || 0);
+                const xc = xCentro(indice);
+                const yy = y(cantidad);
+                const base = y(0);
+                const anchoBarra = Math.min(34, anchoPlot / productosGrafica.length * 0.52);
+                const barra = document.createElementNS(ns, "rect");
+                barra.setAttribute("x", xc - anchoBarra / 2);
+                barra.setAttribute("y", yy);
+                barra.setAttribute("width", anchoBarra);
+                barra.setAttribute("height", Math.max(0, base - yy));
+                barra.setAttribute("rx", "4");
+                barra.setAttribute("fill", colores[indice % colores.length]);
+                svg.appendChild(barra);
+
+                const valorTexto = document.createElementNS(ns, "text");
+                valorTexto.textContent = cantidad;
+                valorTexto.setAttribute("x", xc);
+                valorTexto.setAttribute("y", Math.max(12, yy - 6));
+                valorTexto.setAttribute("text-anchor", "middle");
+                valorTexto.setAttribute("font-size", "12");
+                valorTexto.setAttribute("font-weight", "700");
+                valorTexto.setAttribute("fill", "#374151");
+                svg.appendChild(valorTexto);
+
+                const nombre = document.createElementNS(ns, "text");
+                const palabras = String(producto.nombre).split(/\s+/);
+                const lineasNombre = [];
+                let lineaActual = "";
+                palabras.forEach(palabra => {
+                    const prueba = lineaActual ? lineaActual + " " + palabra : palabra;
+                    if (prueba.length > 12 && lineaActual) {
+                        lineasNombre.push(lineaActual);
+                        lineaActual = palabra;
+                    } else lineaActual = prueba;
+                });
+                if (lineaActual) lineasNombre.push(lineaActual);
+                lineasNombre.slice(0, 2).forEach((linea, i) => {
+                    const tspan = document.createElementNS(ns, "tspan");
+                    tspan.textContent = linea;
+                    tspan.setAttribute("x", xc);
+                    tspan.setAttribute("dy", i === 0 ? "0" : "12");
+                    nombre.appendChild(tspan);
+                });
+                nombre.setAttribute("y", alto - margen.abajo + 16);
+                nombre.setAttribute("text-anchor", "middle");
+                nombre.setAttribute("font-size", "10");
+                nombre.setAttribute("fill", "#4b5563");
+                svg.appendChild(nombre);
+            });
+
+            contenedor.className = "relative w-full overflow-x-auto";
+            contenedor.style.height = alto + "px";
+            contenedor.style.minHeight = alto + "px";
+            contenedor.style.padding = "0";
+            contenedor.style.borderBottom = "1px solid #e5e7eb";
+            contenedor.appendChild(svg);
+
+            datos.grafica = productosGrafica.map(producto => ({
+                nombre: producto.nombre,
+                cantidad: Number(producto.cantidad) || 0
+            }));
+            guardarDatos();
+        }
+
+        function editarGrafica() {
+
+            sincronizarProductosConGrafica();
+
+
+            const contenedor =
+                document.getElementById(
+                    "formGrafica"
+                );
+
+
+            contenedor.innerHTML = "";
+
+
+            datos.grafica.forEach(
+                (producto, indice) => {
+
+                    contenedor.innerHTML += `
+
+                        <div
+                            id="filaGrafica${indice}"
+                            class="grid grid-cols-[1fr_100px_45px]
+                                   gap-2 items-center
+                                   border rounded-lg p-2">
+
+                            <input
+                                id="graficaNombre${indice}"
+                                value="${producto.nombre}"
+                                class="border rounded-lg
+                                       px-3 py-2 min-w-0">
+
+                            <input
+                                id="graficaCantidad${indice}"
+                                type="number"
+                                min="0"
+                                value="${producto.cantidad}"
+                                class="border rounded-lg
+                                       px-3 py-2">
+
+                            <button
+                                type="button"
+                                onclick="eliminarProductoGrafica(${indice})"
+                                class="h-10
+                                       bg-red-100
+                                       text-red-600
+                                       hover:bg-red-200
+                                       rounded-lg
+                                       flex items-center
+                                       justify-center">
+
+                                🗑️
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+
+            if (
+                datos.grafica.length === 0
+            ) {
+
+                contenedor.innerHTML = `
+
+                    <p class="text-sm text-gray-500">
+                        No hay productos para mostrar.
+                    </p>
+
+                `;
+
+            }
+
+
+            document.getElementById(
+                "modalGrafica"
+            ).classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        /* =====================================================
+           ELIMINAR PRODUCTO DE LA GRÁFICA
+        ====================================================== */
+
+        function eliminarProductoGrafica(indice) {
+            const producto = (datos.grafica || [])[indice];
+            if (!producto) return;
+
+            const normalizar = valor => String(valor ?? "").trim().toLocaleLowerCase("es");
+            const nombre = normalizar(producto.nombre);
+            if (!nombre) return;
+
+            if (!confirm(`¿Seguro que deseas eliminar "${producto.nombre}" del inventario? Esta acción no se puede deshacer.`)) return;
+
+            // Guardar siempre el inventario actualizado, incluso cuando queda vacío.
+            const inventarioActual = obtenerProductosInventario();
+            const inventarioActualizado = inventarioActual.filter(item =>
+                normalizar(obtenerNombreProducto(item)) !== nombre
+            );
+            localStorage.setItem("productosInventario", JSON.stringify(inventarioActualizado));
+
+            // Quitar el producto de todas las listas visibles/guardadas del panel.
+            datos.grafica = (datos.grafica || []).filter(item => normalizar(item.nombre || item.producto || item.nombreProducto || item.descripcion) !== nombre);
+            datos.actividades = (datos.actividades || []).filter(item => normalizar(item.nombre || item.producto || item.nombreProducto || item.descripcion) !== nombre);
+            datos.alertas = (datos.alertas || []).filter(item => {
+                const texto = typeof item === "string" ? item : (item.nombre || item.producto || item.nombreProducto || item.descripcion || "");
+                return normalizar(texto) !== nombre;
+            });
+
+            // El número de arriba refleja los productos reales, nunca una cifra de ejemplo.
+            datos.productos = inventarioActualizado.length;
+            guardarDatos();
+            cerrarModal("modalGrafica");
+            actualizarPanel();
+            mostrarGrafica();
+            mostrarActividades();
+            mostrarCategorias();
+            if (typeof mostrarAlertas === "function") mostrarAlertas();
+        }
+
+        /* =====================================================
+           GUARDAR GRÁFICA
+        ====================================================== */
+
+        function guardarGrafica() {
+
+            datos.grafica.forEach(
+                (producto, indice) => {
+
+                    const nombreInput =
+                        document.getElementById(
+                            "graficaNombre" +
+                            indice
+                        );
+
+
+                    const cantidadInput =
+                        document.getElementById(
+                            "graficaCantidad" +
+                            indice
+                        );
+
+
+                    if (
+                        nombreInput &&
+                        cantidadInput
+                    ) {
+
+                        const nombreAnterior =
+                            producto.nombre;
+
+
+                        producto.nombre =
+                            nombreInput.value.trim();
+
+
+                        producto.cantidad =
+                            Number(
+                                cantidadInput.value
+                            );
+
+
+                        /*
+                         * Si existe en productosInventario,
+                         * también actualizamos su nombre/cantidad.
+                         */
+
+                        const productos =
+                            obtenerProductosInventario();
+
+
+                        productos.forEach(
+                            item => {
+
+                                if (
+                                    obtenerNombreProducto(
+                                        item
+                                    ).toLowerCase() ===
+                                    nombreAnterior.toLowerCase()
+                                ) {
+
+                                    item.nombre =
+                                        producto.nombre;
+
+                                    item.cantidad =
+                                        producto.cantidad;
+
+                                }
+
+                            }
+                        );
+
+
+                        if (
+                            productos.length > 0
+                        ) {
+
+                            localStorage.setItem(
+                                "productosInventario",
+                                JSON.stringify(
+                                    productos
+                                )
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            guardarDatos();
+
+            actualizarPanel();
+
+            cerrarModal(
+                "modalGrafica"
+            );
+
+
+            alert(
+                "✅ Gráfica actualizada."
+            );
+
+        }
+
+
+        /* =====================================================
+           NOTIFICACIONES
+        ====================================================== */
+
+        function mostrarNotificaciones() {
+
+            const alertasAutomaticas =
+                generarAlertasAutomaticas();
+
+
+            if (
+                alertasAutomaticas.length === 0 &&
+                datos.alertas.length === 0
+            ) {
+
+                alert(
+                    "🔔 No tienes alertas pendientes."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                alertasAutomaticas.length > 0
+            ) {
+
+                alert(
+                    "🔔 Tienes " +
+                    alertasAutomaticas.length +
+                    " alerta(s) reales de inventario."
+                );
+
+                return;
+
+            }
+
+
+            alert(
+                "🔔 Tienes " +
+                datos.alertas.length +
+                " alerta(s) de inventario."
+            );
+
+        }
+
+
+        /* =====================================================
+           CONFIGURACIÓN
+        ====================================================== */
+
+        function abrirConfiguracion() {
+
+            alert(
+                "⚙️ Configuración\n\n" +
+                "Esta sección queda preparada " +
+                "para conectarse posteriormente " +
+                "con el módulo de configuración."
+            );
+
+        }
+
+
+        /* =====================================================
+           NAVEGACIÓN
+        ====================================================== */
+
+        function irA(pagina) {
+
+            window.location.href =
+                pagina;
+
+        }
+
+
+        /* =====================================================
+           CERRAR SESIÓN
+        ====================================================== */
+
+        function cerrarSesion() {
+
+            const confirmar =
+                confirm(
+                    "¿Seguro que deseas cerrar sesión?"
+                );
+
+
+            if (!confirmar) {
+                return;
+            }
+
+
+            alert(
+                "✅ Sesión cerrada correctamente."
+            );
+
+        }
+
+
+        /* =====================================================
+           CERRAR MODAL
+        ====================================================== */
+
+        function cerrarModal(id) {
+
+            document.getElementById(
+                id
+            ).classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        /* =====================================================
+           ACTUALIZAR PANEL
+        ====================================================== */
+
+        function actualizarPanel() {
+            datos.productos = obtenerProductosInventario().length;
+            const contadorProductos = document.getElementById("totalProductos");
+            if (contadorProductos) contadorProductos.textContent = String(datos.productos);
+
+            sincronizarProductosConGrafica();
+
+
+            /*
+             * ALERTAS REALES
+             */
+
+            const alertasAutomaticas =
+                generarAlertasAutomaticas();
+
+
+            /*
+             * Si existen productos reales,
+             * actualizamos los contadores automáticamente.
+             */
+
+            const productosInventario =
+                obtenerProductosInventario();
+
+
+            // El contador principal siempre depende del inventario guardado, incluso si es cero.
+            datos.productos = productosInventario.length;
+
+            if (productosInventario.length > 0) {
+                let stockBajoReal = 0;
+
+                let proximosVencerReal = 0;
+
+
+                productosInventario.forEach(
+                    producto => {
+
+                        const cantidad =
+                            obtenerCantidadProducto(
+                                producto
+                            );
+
+
+                        const minimo =
+                            obtenerStockMinimo(
+                                producto
+                            );
+
+
+                        if (
+                            cantidad <= minimo
+                        ) {
+
+                            stockBajoReal++;
+
+                        }
+
+
+                        const fecha =
+                            obtenerFechaVencimiento(
+                                producto
+                            );
+
+
+                        if (fecha) {
+
+                            const dias =
+                                diasParaVencer(
+                                    fecha
+                                );
+
+
+                            if (
+                                dias !== null &&
+                                dias >= 0 &&
+                                dias <= 7
+                            ) {
+
+                                proximosVencerReal++;
+
+                            }
+
+                        }
+
+                    }
+                );
+
+
+                datos.stockBajo =
+                    stockBajoReal;
+
+
+                datos.proximosVencer =
+                    proximosVencerReal;
+            } else if (productosInventario.length === 0) {
+                datos.stockBajo = 0;
+                datos.proximosVencer = 0;
+            }
+
+            const totalProductosEl = document.getElementById("totalProductos");
+            if (totalProductosEl) totalProductosEl.textContent = datos.productos;
+            const stockBajoEl = document.getElementById("stockBajo");
+            if (stockBajoEl) stockBajoEl.textContent = datos.stockBajo;
+            const proximosVencerEl = document.getElementById("proximosVencer");
+            if (proximosVencerEl) proximosVencerEl.textContent = datos.proximosVencer;
+
+            mostrarCategorias();
+            guardarDatos();
+/*
+             * El contador ahora muestra las
+             * alertas reales.
+             */
+
+            const cantidadAlertas =
+                productosInventario.length > 0
+                    ? alertasAutomaticas.length
+                    : datos.alertas.length;
+
+
+            document.getElementById(
+                "contadorAlertas"
+            ).textContent =
+                cantidadAlertas;
+
+
+            // Mostrar los nombres de los productos que generan alerta de stock bajo.
+            const listaStockBajo = document.getElementById("productosStockBajo");
+
+            if (listaStockBajo) {
+                listaStockBajo.innerHTML = "";
+
+                const productosConStockBajo = productosInventario.filter(producto =>
+                    obtenerCantidadProducto(producto) <= obtenerStockMinimo(producto)
+                );
+
+                if (productosInventario.length > 0 && productosConStockBajo.length === 0) {
+                    listaStockBajo.innerHTML =
+                        '<p class="text-green-600">✓ Ningún producto necesita reposición.</p>';
+                } else if (productosConStockBajo.length > 0) {
+                    productosConStockBajo.forEach(producto => {
+                        const linea = document.createElement("p");
+                        linea.className = "truncate";
+                        linea.textContent =
+                            "• " + obtenerNombreProducto(producto) +
+                            " (" + obtenerCantidadProducto(producto) + " disponibles)";
+                        listaStockBajo.appendChild(linea);
+                    });
+                } else {
+                    listaStockBajo.innerHTML =
+                        '<p>Los productos con stock bajo aparecerán aquí.</p>';
+                }
+            }
+
+
+            mostrarCategorias();
+
+            mostrarAlertas();
+
+            mostrarActividades();
+
+            mostrarGrafica();
+
+            actualizarPerfil();
+
+
+            guardarDatos();
+
+        }
+
+
+        /* =====================================================
+           CERRAR MENÚS AL HACER CLICK FUERA
+        ====================================================== */
+
+        document.addEventListener("click", function(event) {
+            const menuCuenta = document.getElementById("menuCuenta");
+            const menuInventario = document.getElementById("menuInventario");
+            const botonHamburguesa = event.target.closest('button[onclick="toggleMenuInventario()"]');
+
+            if (menuCuenta && !menuCuenta.contains(event.target) && !event.target.closest("#menuCuenta") && !event.target.closest("button")) {
+                menuCuenta.classList.add("hidden");
+            }
+
+            // El menú ahora ocupa toda la pantalla: solo se cierra con su botón X o al elegir una opción.
+            if (menuInventario && botonHamburguesa && !menuInventario.classList.contains("hidden")) {
+                event.stopPropagation();
+            }
+        });
+
+
+        /* =====================================================
+           ACTUALIZAR SI CAMBIA EL INVENTARIO
+        ====================================================== */
+
+        window.addEventListener(
+            "storage",
+            function(event) {
+
+                if (
+                    event.key ===
+                    "productosInventario"
+                ) {
+
+                    sincronizarProductosConGrafica();
+
+                    actualizarPanel();
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           ACTUALIZAR AL REGRESAR AL PANEL
+        ====================================================== */
+
+        window.addEventListener(
+            "focus",
+            function() {
+
+                sincronizarProductosConGrafica();
+
+                actualizarPanel();
+
+            }
+        );
+
+
+        /* =====================================================
+           ACTUALIZAR CUANDO SE VUELVE A LA PÁGINA
+        ====================================================== */
+
+        window.addEventListener(
+            "pageshow",
+            function() {
+
+                sincronizarProductosConGrafica();
+
+                actualizarPanel();
+
+            }
+        );
+
+        // Revisa el inventario periódicamente para mantener el panel actualizado.
+        // No modifica el diseño ni agrega productos; solo vuelve a leer lo guardado.
+        let firmaInventarioAnterior = "";
+        function revisarCambiosInventario() {
+            const productos = obtenerProductosInventario();
+            let firma = "";
+            try { firma = JSON.stringify(productos); } catch (_) {}
+            if (firma !== firmaInventarioAnterior) {
+                firmaInventarioAnterior = firma;
+                actualizarPanel();
+            }
+        }
+        revisarCambiosInventario();
+        window.setInterval(revisarCambiosInventario, 2000);
+
+
+        /* =====================================================
+           ALERTAS AUTOMÁTICAS EN TIEMPO REAL
+        ====================================================== */
+
+        let firmaAlertasAnterior = "";
+
+        function obtenerFirmaAlertas(alertas) {
+            return alertas
+                .map(alerta => alerta.nombre + "|" + alerta.tipo + "|" + alerta.mensaje)
+                .sort()
+                .join("||");
+        }
+
+        function mostrarAvisoAlertaAutomatica(alerta) {
+            let aviso = document.getElementById("avisoAlertaAutomatico");
+
+            if (!aviso) {
+                aviso = document.createElement("div");
+                aviso.id = "avisoAlertaAutomatico";
+                aviso.className =
+                    "fixed top-20 right-5 z-[9999] max-w-sm " +
+                    "bg-white border border-orange-200 rounded-xl " +
+                    "shadow-xl p-4";
+                document.body.appendChild(aviso);
+            }
+
+            const icono = alerta.tipo === "stock" ? "🔴"
+                : alerta.tipo === "vencido" ? "❌"
+                : alerta.tipo === "hoy" ? "🚨"
+                : "📅";
+
+            aviso.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">${icono}</span>
+                    <div class="flex-1">
+                        <p class="font-bold text-gray-800">Nueva alerta de inventario</p>
+                        <p class="text-sm font-semibold text-gray-700 mt-1"></p>
+                        <p class="text-sm text-gray-500 mt-1"></p>
+                    </div>
+                    <button type="button" class="text-gray-400 hover:text-gray-700"
+                        aria-label="Cerrar aviso">✕</button>
+                </div>
+            `;
+
+            const textos = aviso.querySelectorAll("p");
+            textos[1].textContent = alerta.nombre;
+            textos[2].textContent = alerta.mensaje;
+            aviso.querySelector("button").addEventListener("click", () => aviso.remove());
+
+            clearTimeout(window.temporizadorAvisoAlerta);
+            window.temporizadorAvisoAlerta = setTimeout(() => {
+                document.getElementById("avisoAlertaAutomatico")?.remove();
+            }, 8000);
+        }
+
+        function revisarAlertasAutomaticamente() {
+            const productos = obtenerProductosInventario();
+            const alertas = generarAlertasAutomaticas();
+            const firmaActual = obtenerFirmaAlertas(alertas);
+
+            // Actualiza cantidades, nombres de stock bajo y alertas.
+            actualizarPanel();
+
+            // Solo avisa cuando aparece una alerta nueva después de la primera revisión.
+            if (firmaAlertasAnterior && firmaActual !== firmaAlertasAnterior && alertas.length > 0) {
+                const alertasAnteriores = firmaAlertasAnterior.split("||");
+                const nuevaAlerta = alertas.find(alerta => {
+                    const firma = alerta.nombre + "|" + alerta.tipo + "|" + alerta.mensaje;
+                    return !alertasAnteriores.includes(firma);
+                });
+
+                if (nuevaAlerta) {
+                    mostrarAvisoAlertaAutomatica(nuevaAlerta);
+                }
+            }
+
+            firmaAlertasAnterior = firmaActual;
+        }
+
+
+        /* =====================================================
+           INICIAR SISTEMA
+        ====================================================== */
+
+        sincronizarProductosConGrafica();
+
+        actualizarPanel();
+
+        firmaAlertasAnterior = obtenerFirmaAlertas(generarAlertasAutomaticas());
+
+        // Revisa de nuevo cada minuto por si cambian cantidades o fechas.
+        setInterval(revisarAlertasAutomaticamente, 60 * 1000);
+
+    </script>
+
+    <script>
+      // Configura aquí el número de soporte con código de país, solo dígitos.
+      // Ejemplo de formato para El Salvador: 503XXXXXXXX (reemplázalo por el número real).
+      const NUMERO_WHATSAPP_SOPORTE = "5030000000"; // Numero ficticio: cambia este valor por el numero real de soporte.
+
+      function cerrarCentroAyuda() {
+        const modal = document.getElementById("modalCentroAyuda");
+        if (modal) modal.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+
+      function abrirCentroAyuda() {
+        const modal = document.getElementById("modalCentroAyuda");
+        if (modal) modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+        const menu = document.getElementById("menuCuenta");
+        if (menu) menu.classList.add("hidden");
+        const menuInventario = document.getElementById("menuInventario");
+        if (menuInventario) menuInventario.classList.add("hidden");
+      }
+
+      function enviarAyudaWhatsApp(problema) {
+        const numero = String(NUMERO_WHATSAPP_SOPORTE || "").replace(/\D/g, "");
+        if (!numero) {
+          alert("Este es un número temporal de prueba. Reemplázalo por el número real de soporte para que el mensaje llegue a la persona correcta.");
+          return;
+        }
+        const detalle = (document.getElementById("detalleAyuda")?.value || "").trim();
+        if (numero === "5030000000") {
+          alert("El Centro de ayuda ya funciona, pero el número de WhatsApp es ficticio. Cambia NUMERO_WHATSAPP_SOPORTE por un número real para enviar la consulta.");
+          return;
+        }
+        const mensaje = "Hola, necesito ayuda con el Inventario Escolar.\n\nProblema: " + problema + (detalle ? "\n\nDetalles: " + detalle : "") + "\n\n¿Me pueden ayudar, por favor?";
+        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(mensaje), "_blank", "noopener,noreferrer");
+      }
+    </script>
+
+
+    <!-- CENTRO DE AYUDA INTEGRADO: todo funciona desde este único archivo -->
+    <div id="modalCentroAyuda" class="hidden fixed inset-0 z-[100] flex items-stretch justify-stretch bg-white" onclick="if(event.target===this) cerrarCentroAyuda()">
+      <section class="w-full h-full flex flex-col overflow-hidden bg-white" style="height:100dvh;" role="dialog" aria-modal="true" aria-label="Centro de ayuda">
+        <!-- Botón de regreso integrado en la propia pantalla de ayuda. -->
+
+        <iframe title="Centro de ayuda y soluciones" style="display:block;width:100%;height:100dvh;min-height:100%;flex:1 1 auto;border:0;background:#fff9fc;" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Centro de Ayuda | Inventario Escolar&lt;/title&gt;
+&lt;style&gt;
+:root{--green:#a8b5eb;--green2:#626fae;--pale:#f0edff;--ink:#45445a;--muted:#77768c;--line:#e8e3f0}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#fff9fc;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{position:sticky;top:0;z-index:20;background:#f4f0ff;border-bottom:1px solid var(--line);padding:16px 5%;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;min-height:78px}.back-panel{position:sticky;top:8px;z-index:30;display:inline-flex;align-items:center;justify-content:center;background:#fff!important;color:#514b79!important;border:2px solid #aaa2df!important;box-shadow:0 4px 14px #514b7940!important;white-space:nowrap;min-height:46px;padding:12px 18px;flex-shrink:0;border-radius:12px}.back-panel:hover{background:#e9e5ff!important;transform:translateY(-1px)}header{position:sticky;top:0;z-index:20;padding-right:5%;}@media(max-width:600px){.back-panel{top:4px;min-height:42px;padding:10px 12px;font-size:12px}header{padding-right:5%;min-height:72px}.brand{font-size:16px}}
+.brand{font-size:20px;font-weight:800;color:#626fae}.brand small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:4px}
+a.btn,button.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;font-size:14px}
+.primary{background:#a8b5eb;color:#30375e}.secondary{background:#fff0f5;color:#62536a;border:1px solid #ead9e8!important}
+main{max-width:1280px;margin:0 auto;padding:26px 4% 36px}.intro{background:linear-gradient(135deg,#dcd8ff,#f9dce9 55%,#d8eff0);color:#4c4a69;border:1px solid #eee3f4;border-radius:20px;padding:30px;margin-bottom:24px}.intro p{color:#64617d}
+.intro h1{font-size:clamp(26px,4vw,36px);margin:0 0 10px}.intro p{margin:0;line-height:1.6;max-width:700px;color:#64617d}
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:22px}
+.panel{background:#fff;border:1px solid #eee4f0;border-radius:16px;padding:22px;box-shadow:0 5px 20px #aa9eb51a}
+.panel h2{font-size:20px;margin:0 0 8px}.muted{color:var(--muted);font-size:14px;line-height:1.55}
+.issues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.issue{background:#fff9fc;border:1px solid #e9dfef;border-radius:12px;padding:14px;text-align:left;cursor:pointer;min-height:80px;color:var(--ink);font-size:14px;font-weight:700}
+.issue span{display:block;font-size:23px;margin-bottom:8px}.issue[aria-pressed=&quot;true&quot;]{border:2px solid #a8a0e4;background:#f0edff}
+.solution{background:#f4f8ff;border:1px solid #dfe8f7;border-radius:12px;padding:17px;margin-top:16px}
+.solution h3{margin:0 0 10px;font-size:17px}.solution ol{padding-left:21px;line-height:1.65;margin:8px 0}.solution p{line-height:1.6}
+label{display:block;font-weight:700;font-size:14px;margin:14px 0 7px}select,input,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:#fff;color:var(--ink)}textarea{min-height:110px;resize:vertical}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.status{font-size:13px;line-height:1.5;margin-top:12px;color:#626fae}
+.faq{border-top:1px solid var(--line);padding:14px 0}.faq summary{font-weight:700;cursor:pointer}.faq p{color:var(--muted);line-height:1.55;font-size:14px}
+footer{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px;background:#f4f0ff}
+.wa{position:fixed;right:20px;bottom:20px;background:#c9e9df;color:#315e53;border-radius:999px;padding:14px 18px;text-decoration:none;font-weight:800;box-shadow:0 8px 25px #16653440}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.issues{grid-template-columns:repeat(2,minmax(0,1fr))}main{margin:0 auto;padding:18px 12px 30px}.intro{padding:24px}.panel{padding:18px}header{padding:14px 16px}}
+@media(max-width:420px){.issues{grid-template-columns:1fr}.wa{right:12px;bottom:12px}}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header&gt;
+  &lt;div class=&quot;brand&quot;&gt;Inventario Escolar &lt;small&gt;Centro de ayuda y soluciones&lt;/small&gt;&lt;/div&gt;
+  
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class=&quot;intro&quot; style=&quot;position:relative;padding-right:220px;min-height:132px;&quot;&gt;
+    &lt;h1&gt;¿En qué podemos ayudarte?&lt;/h1&gt;
+    &lt;p&gt;Selecciona el problema para ver una guía de solución. Si los pasos no funcionan, describe lo ocurrido y prepara una consulta para el equipo de soporte.&lt;/p&gt;
+    &lt;button class=&quot;btn secondary back-panel&quot; style=&quot;position:absolute;right:20px;top:24px;z-index:5;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-shadow:0 3px 10px #9b8bd833;&quot; type=&quot;button&quot; onclick=&quot;parent.cerrarCentroAyuda()&quot; aria-label=&quot;Volver al panel de control&quot;&gt;← Volver al panel&lt;/button&gt;
+  &lt;/section&gt;
+  &lt;div class=&quot;layout&quot;&gt;
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Elige el problema&lt;/h2&gt;
+      &lt;p class=&quot;muted&quot;&gt;Pulsa una opción y aquí aparecerán los pasos recomendados.&lt;/p&gt;
+      &lt;div class=&quot;issues&quot; id=&quot;issues&quot;&gt;
+        &lt;button class=&quot;issue&quot; data-issue=&quot;guardar&quot; aria-pressed=&quot;true&quot;&gt;&lt;span&gt;💾&lt;/span&gt;No puedo guardar cambios&lt;/button&gt;
+        &lt;button class=&quot;issue&quot; data-issue=&quot;productos&quot; aria-pressed=&quot;false&quot;&gt;&lt;span&gt;📦&lt;/span&gt;Problemas con productos&lt;/button&gt;
+        &lt;button class=&quot;issue&quot; data-issue=&quot;cuenta&quot; aria-pressed=&quot;false&quot;&gt;&lt;span&gt;👤&lt;/span&gt;Problemas con mi cuenta&lt;/button&gt;
+        &lt;button class=&quot;issue&quot; data-issue=&quot;alertas&quot; aria-pressed=&quot;false&quot;&gt;&lt;span&gt;🔔&lt;/span&gt;No aparecen las alertas&lt;/button&gt;
+                &lt;button class=&quot;issue&quot; data-issue=&quot;acceso&quot; aria-pressed=&quot;false&quot;&gt;&lt;span&gt;🔐&lt;/span&gt;No puedo entrar al sistema&lt;/button&gt;
+        &lt;button class=&quot;issue&quot; data-issue=&quot;otro&quot; aria-pressed=&quot;false&quot;&gt;&lt;span&gt;🛠️&lt;/span&gt;Otro problema&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;solution&quot; id=&quot;solution&quot; aria-live=&quot;polite&quot;&gt;
+        &lt;h3 id=&quot;solutionTitle&quot;&gt;💾 No puedo guardar cambios&lt;/h3&gt;
+        &lt;div id=&quot;solutionBody&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+    &lt;section class=&quot;panel&quot;&gt;
+      &lt;h2&gt;Enviar una consulta&lt;/h2&gt;
+      &lt;p class=&quot;muted&quot;&gt;Cuéntanos qué estabas intentando hacer y qué ocurrió. El formulario comprobará que los datos estén completos antes de preparar el mensaje.&lt;/p&gt;
+      &lt;form id=&quot;helpForm&quot;&gt;
+        &lt;label for=&quot;topic&quot;&gt;Tipo de problema&lt;/label&gt;
+        &lt;select id=&quot;topic&quot; required&gt;
+          &lt;option value=&quot;&quot;&gt;Selecciona una opción&lt;/option&gt;
+          &lt;option&gt;No puedo guardar cambios&lt;/option&gt;&lt;option&gt;Problemas con productos&lt;/option&gt;
+          &lt;option&gt;Problemas con mi cuenta&lt;/option&gt;&lt;option&gt;No aparecen las alertas&lt;/option&gt;
+          &lt;option&gt;No puedo entrar al sistema&lt;/option&gt;&lt;option&gt;Otro problema&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;label for=&quot;detail&quot;&gt;¿Qué sucede?&lt;/label&gt;
+        &lt;textarea id=&quot;detail&quot; required minlength=&quot;8&quot; placeholder=&quot;Ejemplo: pulso Guardar, pero los datos no se actualizan...&quot;&gt;&lt;/textarea&gt;
+        &lt;label for=&quot;contact&quot;&gt;Correo o forma de contacto (opcional)&lt;/label&gt;
+        &lt;input id=&quot;contact&quot; type=&quot;text&quot; placeholder=&quot;Tu correo, si deseas incluirlo&quot;&gt;
+        &lt;div class=&quot;actions&quot;&gt;
+          &lt;button class=&quot;btn primary&quot; type=&quot;submit&quot;&gt;Preparar consulta&lt;/button&gt;
+          &lt;button class=&quot;btn secondary&quot; type=&quot;button&quot; id=&quot;clearForm&quot;&gt;Limpiar&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;status&quot; id=&quot;formStatus&quot; role=&quot;status&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;actions&quot; id=&quot;sendActions&quot; hidden&gt;
+          &lt;a class=&quot;btn primary&quot; id=&quot;whatsappLink&quot; href=&quot;#&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Abrir WhatsApp&lt;/a&gt;
+          &lt;button class=&quot;btn secondary&quot; type=&quot;button&quot; id=&quot;copyMessage&quot;&gt;Copiar mensaje&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;section class=&quot;panel&quot; style=&quot;margin-top:22px&quot;&gt;
+    &lt;h2&gt;Preguntas frecuentes&lt;/h2&gt;
+    &lt;details class=&quot;faq&quot;&gt;&lt;summary&gt;¿Por qué no se guardan los datos?&lt;/summary&gt;&lt;p&gt;Comprueba que los campos obligatorios estén completos y que el navegador no muestre errores. Si la aplicación guarda datos localmente, usa el mismo navegador y no borres sus datos del sitio. Un archivo HTML por sí solo no sincroniza datos entre computadoras.&lt;/p&gt;&lt;/details&gt;
+    &lt;details class=&quot;faq&quot;&gt;&lt;summary&gt;¿Por qué no aparece un producto o una alerta?&lt;/summary&gt;&lt;p&gt;Revisa que el producto se haya guardado, que la fecha de vencimiento sea correcta y que no haya filtros activos. Recarga la página después de comprobarlo. Las alertas dependen de que la aplicación tenga fechas válidas y de que su código las calcule.&lt;/p&gt;&lt;/details&gt;
+    &lt;details class=&quot;faq&quot;&gt;&lt;summary&gt;¿Por qué no puedo cambiar la foto del administrador?&lt;/summary&gt;&lt;p&gt;Selecciona una imagen compatible y confirma que el navegador permita leer el archivo. Si la foto solo se guarda en memoria, puede desaparecer al recargar; para conservarla debe implementarse almacenamiento persistente.&lt;/p&gt;&lt;/details&gt;
+    &lt;details class=&quot;faq&quot;&gt;&lt;summary&gt;¿Qué hago si los pasos no funcionan?&lt;/summary&gt;&lt;p&gt;Describe el paso exacto, lo que esperabas que ocurriera y el mensaje de error, si aparece. No incluyas contraseñas ni información confidencial.&lt;/p&gt;&lt;/details&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer&gt;Inventario Escolar · Centro de ayuda&lt;/footer&gt;
+&lt;a class=&quot;wa&quot; id=&quot;floatingWhatsApp&quot; href=&quot;https://wa.me/5030000000?text=Hola%2C%20necesito%20ayuda%20con%20el%20Inventario%20Escolar.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; aria-label=&quot;Contactar por WhatsApp&quot;&gt;&lt;span aria-hidden=&quot;true&quot; style=&quot;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#fff;color:#25D366;font-weight:800;font-size:19px;margin-right:8px&quot;&gt;◔&lt;/span&gt; WhatsApp&lt;/a&gt;
+&lt;script&gt;
+const helpData = {
+ guardar:{title:&quot;💾 No puedo guardar cambios&quot;,steps:[&quot;Comprueba que todos los campos obligatorios estén completos y que no haya mensajes de validación.&quot;,&quot;Pulsa Guardar una sola vez y espera el aviso de confirmación.&quot;,&quot;Si no ocurre nada, recarga la página solo después de copiar los datos que no quieras perder.&quot;,&quot;Si continúa, anota el botón que pulsaste y el mensaje de error. Puede ser necesario corregir el JavaScript del panel.&quot;]},
+ productos:{title:&quot;📦 Problemas con productos&quot;,steps:[&quot;Revisa que el nombre del producto esté escrito y que la cantidad sea un número válido.&quot;,&quot;Comprueba que la categoría y la fecha de vencimiento sean correctas.&quot;,&quot;Busca si el producto ya aparece en la tabla o si hay un filtro activo.&quot;,&quot;Si editar o eliminar no funciona, registra el nombre del botón y el resultado que aparece.&quot;]},
+ cuenta:{title:&quot;👤 Problemas con mi cuenta&quot;,steps:[&quot;Revisa el nombre, correo y demás campos antes de guardar.&quot;,&quot;Para la foto, selecciona un archivo de imagen válido (por ejemplo JPG o PNG).&quot;,&quot;Guarda los cambios y comprueba si aparece un aviso de confirmación.&quot;,&quot;No compartas contraseñas. Si la foto o los datos desaparecen al recargar, puede faltar almacenamiento persistente.&quot;]},
+ alertas:{title:&quot;🔔 No aparecen las alertas&quot;,steps:[&quot;Comprueba que cada producto tenga una fecha de vencimiento válida.&quot;,&quot;Verifica que la fecha esté escrita en el formato esperado por el formulario.&quot;,&quot;Revisa si el producto vence dentro del período de alerta configurado.&quot;,&quot;Recarga el panel. Si sigue sin aparecer, la lógica que calcula las alertas debe revisarse en el código.&quot;]},
+ acceso:{title:&quot;🔐 No puedo entrar al sistema&quot;,steps:[&quot;Comprueba que estés abriendo el archivo correcto y que el nombre de la página no haya cambiado.&quot;,&quot;Si el sistema usa inicio de sesión, verifica el usuario y la contraseña en la pantalla oficial; no compartas la contraseña por este formulario.&quot;,&quot;Prueba abrir la página en el mismo navegador donde normalmente trabajas.&quot;,&quot;Si aparece un error, copia el texto del error sin incluir datos privados.&quot;]},
+ otro:{title:&quot;🛠️ Otro problema&quot;,steps:[&quot;Describe qué estabas intentando hacer.&quot;,&quot;Indica qué esperabas que ocurriera y qué ocurrió en realidad.&quot;,&quot;Si aparece un mensaje de error, copia su texto; evita enviar contraseñas o datos privados.&quot;,&quot;Usa el formulario para preparar una consulta con los detalles.&quot;]}
+};
+let currentIssue=&quot;guardar&quot;, preparedMessage=&quot;&quot;;
+function renderIssue(key){
+ currentIssue=key; const item=helpData[key]||helpData.otro;
+ document.getElementById(&quot;solutionTitle&quot;).textContent=item.title;
+ const ol=document.createElement(&quot;ol&quot;);
+ item.steps.forEach(step=&gt;{const li=document.createElement(&quot;li&quot;);li.textContent=step;ol.appendChild(li)});
+ const body=document.getElementById(&quot;solutionBody&quot;);body.replaceChildren(ol);
+ document.querySelectorAll(&quot;.issue&quot;).forEach(btn=&gt;btn.setAttribute(&quot;aria-pressed&quot;,String(btn.dataset.issue===key)));
+ const topic=document.getElementById(&quot;topic&quot;);
+ const map={guardar:&quot;No puedo guardar cambios&quot;,productos:&quot;Problemas con productos&quot;,cuenta:&quot;Problemas con mi cuenta&quot;,alertas:&quot;No aparecen las alertas&quot;,acceso:&quot;No puedo entrar al sistema&quot;,otro:&quot;Otro problema&quot;};
+ topic.value=map[key]||&quot;&quot;;
+}
+document.querySelectorAll(&quot;.issue&quot;).forEach(btn=&gt;btn.addEventListener(&quot;click&quot;,()=&gt;renderIssue(btn.dataset.issue)));
+document.getElementById(&quot;helpForm&quot;).addEventListener(&quot;submit&quot;,e=&gt;{
+ e.preventDefault();
+ const topic=document.getElementById(&quot;topic&quot;).value.trim(), detail=document.getElementById(&quot;detail&quot;).value.trim(), contact=document.getElementById(&quot;contact&quot;).value.trim();
+ const status=document.getElementById(&quot;formStatus&quot;), actions=document.getElementById(&quot;sendActions&quot;);
+ if(!topic||detail.length&lt;8){status.textContent=&quot;Selecciona el tipo de problema y escribe al menos 8 caracteres para explicar lo ocurrido.&quot;;actions.hidden=true;return}
+ preparedMessage=&quot;Hola, necesito ayuda con el Inventario Escolar.\\nProblema: &quot;+topic+&quot;\\nDetalle: &quot;+detail+(contact?&quot;\\nContacto: &quot;+contact:&quot;&quot;);
+ document.getElementById(&quot;whatsappLink&quot;).href=&quot;https://wa.me/5030000000?text=&quot;+encodeURIComponent(preparedMessage);
+ status.textContent=&quot;Consulta preparada. Puedes abrir WhatsApp o copiar el mensaje. El número de WhatsApp de ejemplo debe reemplazarse por el número real de soporte.&quot;;
+ actions.hidden=false;
+});
+document.getElementById(&quot;clearForm&quot;).addEventListener(&quot;click&quot;,()=&gt;{
+ document.getElementById(&quot;helpForm&quot;).reset();document.getElementById(&quot;formStatus&quot;).textContent=&quot;Formulario limpiado.&quot;;document.getElementById(&quot;sendActions&quot;).hidden=true;
+});
+document.getElementById(&quot;copyMessage&quot;).addEventListener(&quot;click&quot;,async()=&gt;{
+ const status=document.getElementById(&quot;formStatus&quot;);
+ try{await navigator.clipboard.writeText(preparedMessage);status.textContent=&quot;Mensaje copiado. Ya puedes pegarlo donde necesites.&quot;}
+ catch(err){const area=document.getElementById(&quot;detail&quot;);area.focus();status.textContent=&quot;No se pudo copiar automáticamente. Selecciona y copia el texto de la consulta desde el formulario.&quot;}
+});
+renderIssue(&quot;guardar&quot;);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;" class="w-full h-full border-0" loading="eager"></iframe>
+      </section>
+    </div>
+
+    <!-- BOTÓN FLOTANTE DE WHATSAPP -->
+    <button type="button" onclick="abrirCentroAyuda()" title="Abrir centro de ayuda" aria-label="Abrir centro de ayuda" class="fixed bottom-5 right-5 z-[90] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:scale-105 hover:bg-[#1ebe5d]" style="box-shadow:0 8px 22px rgba(37,211,102,.32)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M16.04 3.2A12.72 12.72 0 0 0 5.08 22.36L3.4 28.5l6.3-1.65A12.75 12.75 0 1 0 16.04 3.2Zm0 23.2c-2 0-3.96-.54-5.67-1.57l-.4-.24-3.74.98 1-3.64-.26-.42a10.4 10.4 0 1 1 9.07 4.89Zm5.7-7.8c-.31-.16-1.84-.91-2.13-1.01-.29-.11-.5-.16-.71.16-.21.31-.82 1.01-1.01 1.22-.18.21-.37.24-.68.08-.31-.16-1.31-.48-2.49-1.52-.92-.82-1.54-1.83-1.72-2.14-.18-.31-.02-.48.14-.64.14-.14.31-.37.47-.55.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.55-.08-.16-.71-1.7-.97-2.32-.25-.6-.51-.52-.71-.53h-.61c-.21 0-.55.08-.84.39-.29.31-1.1 1.07-1.1 2.61s1.13 3.03 1.29 3.24c.16.21 2.22 3.39 5.38 4.76.75.32 1.34.51 1.8.65.76.24 1.45.2 2 .12.61-.09 1.84-.75 2.1-1.49.26-.73.26-1.36.18-1.49-.08-.13-.29-.21-.6-.37Z"/></svg></button>
+
+
+</body>
+
+</html>

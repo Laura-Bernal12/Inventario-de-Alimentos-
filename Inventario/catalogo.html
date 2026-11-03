@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Inventario Escolar</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;color:#263238}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+.oculto{display:none!important}
+.contenido{width:100%;min-height:100vh}
+
+/* CABECERA */
+.cabecera{min-height:110px;background:#fff;border-bottom:1px solid #dfe4e8;display:flex;align-items:center;padding:20px 40px}
+.titulo{position:absolute;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.titulo h1{font-size:27px;margin-bottom:6px}
+.titulo p{color:#6c757d;font-size:15px}
+.usuario{margin-left:auto;display:flex;align-items:center;gap:9px}
+
+/* NOTIFICACIONES */
+.notificaciones{position:relative}
+.btn-campana{border:0;background:transparent;font-size:22px;position:relative;width:42px;height:42px}
+.contador-notificaciones{position:absolute;top:0;right:0;min-width:18px;height:18px;padding:2px 5px;background:#d85b70;color:#fff;border-radius:10px;font-size:11px;font-weight:bold}
+.panel-notificaciones{position:absolute;top:50px;right:0;width:330px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 25px #0002;z-index:20000;overflow:hidden}
+.titulo-notificaciones{padding:15px;display:flex;justify-content:space-between;border-bottom:1px solid #eee}
+.titulo-notificaciones span{color:#888;font-size:13px}
+.notificacion-item{display:flex;align-items:center;gap:12px;padding:15px;border-bottom:1px solid #eee}
+.icono-notificacion{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:#fff0e0;border-radius:50%}
+.texto-notificacion{display:flex;flex-direction:column;gap:3px}
+.texto-notificacion span,.texto-notificacion small{color:#777;font-size:13px}
+.sin-notificaciones{padding:25px;text-align:center;color:#888}
+
+/* ADMIN */
+.foto-usuario{width:40px;height:40px;border-radius:50%;background:#174ea6;display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+.foto-usuario img{width:100%;height:100%;object-fit:cover}
+.admin-btn{border:0;background:transparent;display:flex;align-items:center;gap:7px;font-size:15px;font-weight:bold;color:#37474f}
+.flecha{font-size:18px}
+.menu-admin{position:fixed;top:85px;right:25px;width:220px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 25px #0002;z-index:30000;overflow:hidden}
+.menu-admin-header{padding:12px 15px;border-bottom:1px solid #eee;background:#f8fafc}
+.menu-admin-header strong{display:block;font-size:13px;color:#174ea6}
+.menu-admin-header span{display:block;font-size:12px;color:#777;margin-top:3px}
+.menu-admin button{width:100%;padding:13px 15px;border:0;background:#fff;text-align:left;font-size:14px}
+.menu-admin button:hover{background:#f2f5f8}
+
+/* CATALOGO */
+.catalogo{padding:32px 40px}
+.encabezado-modulo{display:flex;align-items:center;gap:12px;margin-bottom:25px}
+.encabezado-modulo h2{font-size:23px}
+.icono-grande{font-size:28px}
+.barra-superior{display:flex;align-items:center;gap:15px;margin-bottom:25px}
+.busqueda{flex:1;height:46px;background:#fff;border:1px solid #ccd3d9;border-radius:8px;display:flex;align-items:center;padding:0 12px}
+.lupa{font-size:22px;color:#777}
+.busqueda input{width:100%;border:0;outline:0;padding:10px;font-size:14px}
+.filtro select{height:46px;border:1px solid #ccd3d9;border-radius:8px;background:#fff;padding:0 12px;color:#555;font-size:14px}
+.btn-nuevo{height:46px;border:0;border-radius:8px;background:#174ea6;color:#fff;padding:0 18px;font-weight:bold}
+.btn-nuevo:hover{background:#123d82}
+
+/* TABLA */
+.tabla-contenedor{background:#fff;border-radius:12px;overflow-x:auto;border:1px solid #d9e0e6;box-shadow:0 3px 12px #0001}
+table{width:100%;border-collapse:collapse;min-width:950px}
+thead{background:#edf3fa}
+th{color:#263f5b;font-size:14px;padding:16px 14px;text-align:left;border-right:1px solid #d7e0e8;border-bottom:2px solid #c9d5df}
+td{color:#37474f;font-size:14px;padding:17px 14px;border-right:1px solid #e0e5e9;border-bottom:1px solid #e0e5e9}
+tbody tr:hover{background:#f7faff}
+.nombre-producto{display:block;font-weight:bold}
+.empresa{display:block;color:#999;font-size:12px;margin-top:4px}
+.estado{display:inline-block;padding:7px 10px;border-radius:15px;font-size:12px;font-weight:bold}
+.estado.normal{background:#e3f6ea;color:#16803c}
+.estado.bajo{background:#fff0df;color:#c47b21}
+.btn-detalles{border:1px solid #c9dcfa;background:#eaf2ff;color:#174ea6;padding:7px 14px;border-radius:6px;font-weight:bold}
+.btn-eliminar{margin-left:5px;padding:0;border:none;background:transparent;color:#d9534f;font-size:16px;vertical-align:middle}
+.btn-eliminar:hover{transform:scale(1.05)}
+
+/* CARDS */
+.card{background:#fff;border-radius:11px;padding:22px;box-shadow:0 3px 10px #0001;border:1px solid #e1e6ea}
+.card h3{margin-bottom:10px;font-size:17px}
+.card p{color:#666;margin:7px 0;font-size:14px}
+
+/* MODALES */
+.modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:50000}
+.modal-contenido{width:450px;max-width:90%;max-height:90vh;overflow-y:auto;background:#fff;border-radius:12px;padding:28px;position:relative;box-shadow:0 15px 40px #0004}
+.modal-contenido h2{margin-bottom:22px}
+.cerrar-modal{position:absolute;top:12px;right:15px;border:0;background:transparent;font-size:28px;color:#777}
+.modal-contenido label{display:block;margin:12px 0 6px;font-weight:bold;font-size:14px}
+.modal-contenido input,.modal-contenido select{width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;outline:0}
+.btn-guardar,.btn-cancelar{width:100%;height:43px;border:0;border-radius:7px;font-weight:bold}
+.btn-guardar{margin-top:18px;background:#174ea6;color:#fff}
+.btn-cancelar{margin-top:10px;background:#eef1f4;color:#555}
+
+/* HAMBURGUESA MORADA Y MENU LATERAL */
+.hamb-btn{width:44px;height:44px;border:0;border-radius:8px;background:#f3e8ff;color:#7e22ce;font-size:24px;display:flex;align-items:center;justify-content:center;transition:background .2s;position:fixed;top:20px;left:15px;z-index:9000}
+.hamb-btn:hover{background:#e9d5ff}
+.hamb-fondo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998}
+.hamb-fondo.visible{display:block}
+#menuInventario{position:fixed;top:0;bottom:0;left:0;width:min(320px,86vw);height:100dvh;background:#fff;overflow-y:auto;border-radius:0 14px 14px 0;z-index:9999;box-shadow:8px 0 28px rgba(0,0,0,.14);padding-bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-105%);visibility:hidden;transition:transform .25s ease,visibility .25s}
+#menuInventario.abierto{transform:translateX(0);visibility:visible}
+.hamb-cab{padding:20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hamb-logo-grupo{display:flex;align-items:center;gap:12px;min-width:0}
+.hamb-logo{width:48px;height:48px;flex-shrink:0;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;background:#fff;display:flex;align-items:center;justify-content:center}
+.hamb-logo img{width:100%;height:100%;object-fit:contain}
+.hamb-titulo{margin:0;font-size:16px;font-weight:700;color:#1f2937}
+.hamb-sub{margin:0;font-size:12px;color:#6b7280}
+.hamb-cerrar{min-width:48px;min-height:48px;border:0;border-radius:12px;background:#f3f4f6;font-size:30px;line-height:1;color:#374151}
+.hamb-cerrar:hover{background:#e5e7eb}
+.hamb-item{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:16px 20px;border:0;background:transparent;color:#4b5563;font-size:16px;text-align:left;text-decoration:none;transition:background .2s,color .2s}
+.hamb-item:hover{background:#f3f4f6}
+.hamb-item.activo{background:#f3e8ff;color:#7e22ce;font-weight:600}
+.hamb-sesion{border-top:1px solid #e5e7eb}
+.hamb-sesion .hamb-item:hover{background:#fef2f2;color:#dc2626}
+
+/* RESPONSIVE */
+@media(max-width:850px){.cabecera{padding:20px}.catalogo{padding:25px 20px}.titulo h1{font-size:23px}.barra-superior{flex-wrap:wrap}}
+@media(max-width:600px){
+.cabecera{min-height:120px;padding:15px;align-items:flex-start}
+.titulo{position:static;transform:none;text-align:left;margin-top:50px;white-space:normal;width:100%}
+.titulo h1{font-size:20px}.titulo p{font-size:13px}
+.usuario{position:absolute;right:15px;top:15px}
+.catalogo{padding:20px 15px}
+.barra-superior{flex-direction:column;align-items:stretch}
+.filtro select,.btn-nuevo{width:100%}
+.panel-notificaciones{right:-100px;width:290px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU LATERAL (hamburguesa morada) -->
+<div id="hambFondo" class="hamb-fondo" onclick="hambCerrar()"></div>
+
+<div id="menuInventario" aria-hidden="true">
+  <div class="hamb-cab">
+    <div class="hamb-logo-grupo">
+      <div class="hamb-logo">
+        <img src="./img/logo-instituto.jpg" alt="Logo del Instituto" onerror="this.onerror=null;this.src='img/logo1.png'">
+      </div>
+      <div>
+        <h1 class="hamb-titulo">Inventario</h1>
+        <p class="hamb-sub">Escolar</p>
+      </div>
+    </div>
+    <button type="button" class="hamb-cerrar" onclick="hambCerrar()" aria-label="Cerrar menú">×</button>
+  </div>
+
+  <a href="alimentos.html" class="hamb-item" onclick="hambCerrar()"><span>🏠</span><span>Panel de Control</span></a>
+  <a href="catalogo.html" class="hamb-item activo" onclick="hambCerrar()"><span>📦</span><span>Catálogo</span></a>
+  <a href="entradas.html" class="hamb-item" onclick="hambCerrar()"><span>🍽️</span><span>Menú</span></a>
+  <a href="indext.html" class="hamb-item" onclick="hambCerrar()"><span>⬆️</span><span>Entradas</span></a>
+  <a href="index1.html" class="hamb-item" onclick="hambCerrar()"><span>⬇️</span><span>Salidas</span></a>
+  <button type="button" class="hamb-item" onclick="hambCerrar(); mostrarModulo('configuracion')"><span>⚙️</span><span>Configuración</span></button>
+
+  <div class="hamb-sesion">
+    <button type="button" class="hamb-item" onclick="hambCerrar(); alert('Sesión cerrada correctamente.')"><span>🚪</span><span>Cerrar sesión</span></button>
+  </div>
+</div>
+
+<main class="contenido">
+  <header class="cabecera">
+    <button type="button" id="hambBtn" class="hamb-btn" onclick="hambAlternar()" aria-label="Abrir menú">☰</button>
+
+    <div class="titulo">
+      <h1 id="tituloModulo">Catálogo de Productos</h1>
+      <p id="subtituloModulo">Gestiona el inventario de alimentos</p>
+    </div>
+
+    <div class="usuario">
+      <div class="notificaciones">
+        <button id="btnNotificaciones" class="btn-campana">🔔<span id="contadorNotificaciones" class="contador-notificaciones">0</span></button>
+        <div id="panelNotificaciones" class="panel-notificaciones oculto">
+          <div class="titulo-notificaciones"><strong>Notificaciones</strong><span id="textoAlertas">0 alertas</span></div>
+          <div id="listaNotificaciones"><p class="sin-notificaciones">No hay notificaciones.</p></div>
+        </div>
+      </div>
+      <div class="foto-usuario" id="fotoUsuario">👤</div>
+      <button id="btnAdmin" class="admin-btn"><span id="navUserNombre">Admin</span><span class="flecha">⌄</span></button>
+    </div>
+  </header>
+
+  <section id="contenidoModulo" class="catalogo"></section>
+</main>
+
+<!-- MENU ADMIN -->
+<div id="menuAdmin" class="menu-admin oculto">
+  <div class="menu-admin-header">
+    <strong id="dropUserNombre">Admin</strong>
+    <span id="dropUserCorreo">admin@instituto.com</span>
+    <span id="dropUserRol">Administrador</span>
+  </div>
+  <button id="miCuenta">👤 Mi cuenta</button>
+  <button id="agregarCuenta">👤 Agregar cuenta</button>
+  <button id="cambiarCuenta">🔄 Cambiar cuenta</button>
+  <button id="salirAdmin">🚪 Cerrar sesión</button>
+</div>
+
+<!-- MODAL CUENTA -->
+<div id="modalCuenta" class="modal oculto">
+  <div class="modal-contenido">
+    <button id="cerrarCuenta" class="cerrar-modal">×</button>
+    <h2 id="tituloModalCuenta">Agregar cuenta</h2>
+    <div id="contenidoCuenta"></div>
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div id="modalProducto" class="modal oculto">
+  <div class="modal-contenido">
+    <button id="cerrarModal" class="cerrar-modal">×</button>
+    <h2>Nuevo Producto</h2>
+    <form id="formProducto">
+      <label>Nombre del producto</label>
+      <input id="nombreProducto" type="text" placeholder="Ej. Frijoles" required>
+
+      <label>Categoría</label>
+      <select id="categoriaProducto" required>
+        <option value="">Seleccione una categoría</option>
+        <option>Lácteos</option><option>Granos</option><option>Proteínas</option><option>Verduras</option><option>Panadería</option>
+      </select>
+
+      <label>Cantidad</label>
+      <input id="cantidadProducto" type="number" min="0" step="any" required oninput="calcularMinimoPantalla()">
+
+      <label>Unidad</label>
+      <select id="unidadProducto"><option>Kg</option><option>Libras</option><option>Litros</option><option>Unidades</option></select>
+
+      <label>Stock mínimo (Calculado automáticamente)</label>
+      <input id="minimoProducto" type="number" readonly placeholder="Se calcula según la cantidad" style="background:#f0f4f8;color:#555;font-weight:bold">
+
+      <label>Ubicación</label>
+      <input id="ubicacionProducto" type="text" placeholder="Ej. Almacén A" required>
+
+      <label>Vencimiento</label>
+      <input id="vencimientoProducto" type="date" required>
+
+      <button type="submit" class="btn-guardar">Guardar Producto</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* =========================================================
+   FUNCIONES DEL INVENTARIO (compartidas con las otras páginas
+   a través del localStorage)
+   ========================================================= */
+const INV_CLAVE = "productosInventario";
+const INV_ESPEJOS = ["productos", "inventarioEscolar"];
+const INV_ENTRADAS = "entradasEscolar";
+const INV_MOVS = "movimientosInventario";
+
+function invNorm(t){ return String(t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase(); }
+function invRedondear(n, d = 3){ const f = Math.pow(10, d); return Math.round(n * f) / f; }
+function invFecha(d = new Date()){
+  const m = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  return String(d.getDate()).padStart(2, "0") + " " + m[d.getMonth()] + " " + d.getFullYear();
+}
+function invHora(d = new Date()){ return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+function invFechaISO(d = new Date()){
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function invResponsable(){
+  try {
+    const cuentas = JSON.parse(localStorage.getItem("cuentasInventario") || "[]") || [];
+    const activa = localStorage.getItem("cuentaActivaInventario");
+    const c = cuentas.find(x => x.id === activa) || cuentas[0];
+    if (c && c.nombre) return c.nombre;
+  } catch (e) {}
+  return "Admin";
+}
+function invRegistrarEntradaTabla(d){
+  let lista = [];
+  try { lista = JSON.parse(localStorage.getItem(INV_ENTRADAS) || "[]") || []; } catch (e) { lista = []; }
+  const unidad = d.unidad ? String(d.unidad).trim() : "";
+  const num = invRedondear(Number(d.cantidad), 3);
+  lista.unshift({
+    id: "entrada-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+    producto: d.nombre, categoria: d.categoria || "",
+    cantidad: (num + " " + unidad).trim(), cantidadNumero: num,
+    fecha: invFechaISO(), hora: invHora(),
+    proveedor: d.proveedor || "Ministerio de Educación",
+    responsable: invResponsable(),
+    ubicacion: d.ubicacion || "", vencimiento: d.vencimiento || "",
+    inventarioAplicado: true
+  });
+  localStorage.setItem(INV_ENTRADAS, JSON.stringify(lista));
+}
+function invLeer(){
+  for (const k of [INV_CLAVE, ...INV_ESPEJOS]) {
+    try { const v = JSON.parse(localStorage.getItem(k) || "null"); if (Array.isArray(v)) return v; } catch (e) {}
+  }
+  return [];
+}
+function invGuardar(lista){
+  const texto = JSON.stringify(lista);
+  [INV_CLAVE, ...INV_ESPEJOS].forEach(k => localStorage.setItem(k, texto));
+}
+function invLeerOInicializar(porDefecto){
+  const existe = [INV_CLAVE, ...INV_ESPEJOS].some(k => {
+    try { return Array.isArray(JSON.parse(localStorage.getItem(k) || "null")); } catch (e) { return false; }
+  });
+  if (existe) return invLeer();
+  invGuardar(porDefecto);
+  return porDefecto;
+}
+function invBuscar(lista, nombre){
+  const n = invNorm(nombre);
+  if (!n) return null;
+  const nom = p => invNorm(p?.nombre ?? p?.producto ?? p?.nombreProducto);
+  const exacto = lista.find(p => nom(p) === n);
+  if (exacto) return exacto;
+  const parecidos = lista.filter(p => { const m = nom(p); return m && (m.startsWith(n + " ") || n.startsWith(m + " ")); });
+  return parecidos.length === 1 ? parecidos[0] : null;
+}
+function invMovimientos(){
+  try { return JSON.parse(localStorage.getItem(INV_MOVS) || "[]") || []; } catch (e) { return []; }
+}
+function invAnotarMov(tipo, nombre, cantidad, unidad, nota = ""){
+  const lista = invMovimientos();
+  lista.unshift({ tipo, nombre, cantidad, unidad, nota, fecha: invFecha(), hora: invHora() });
+  localStorage.setItem(INV_MOVS, JSON.stringify(lista.slice(0, 500)));
+}
+
+/* =========================================================
+   CUENTAS
+   ========================================================= */
+let cuentas = [];
+try { cuentas = JSON.parse(localStorage.getItem("cuentasInventario")) || []; } catch (error) { cuentas = []; }
+
+let cuentaActivaId = localStorage.getItem("cuentaActivaInventario");
+let cuentaEditandoId = null;
+let fotoTemporal = "";
+
+function guardarCuentas(){
+  localStorage.setItem("cuentasInventario", JSON.stringify(cuentas));
+  localStorage.setItem("cuentaActivaInventario", cuentaActivaId);
+}
+
+if (cuentas.length === 0) {
+  const inicial = { id: Date.now().toString(), nombre: "Admin", correo: "admin@instituto.com", rol: "Administrador", foto: "" };
+  cuentas.push(inicial);
+  cuentaActivaId = inicial.id;
+  guardarCuentas();
+}
+if (!cuentaActivaId || !cuentas.some(c => c.id === cuentaActivaId)) {
+  cuentaActivaId = cuentas[0].id;
+  guardarCuentas();
+}
+
+function obtenerCuentaActiva(){ return cuentas.find(c => c.id === cuentaActivaId); }
+
+function escapeHTML(text){
+  return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+
+function actualizarPerfil(){
+  const c = obtenerCuentaActiva();
+  if (!c) return;
+  $("navUserNombre").textContent = c.nombre;
+  $("dropUserNombre").textContent = c.nombre;
+  $("dropUserCorreo").textContent = c.correo;
+  $("dropUserRol").textContent = c.rol;
+  $("fotoUsuario").innerHTML = c.foto ? `<img src="${c.foto}" alt="Foto">` : "👤";
+}
+
+function abrirFormCuenta(cuenta){
+  cuentaEditandoId = cuenta ? cuenta.id : null;
+  fotoTemporal = cuenta ? (cuenta.foto || "") : "";
+  $("tituloModalCuenta").textContent = cuenta ? "Mi cuenta" : "Agregar cuenta";
+  const rol = cuenta ? cuenta.rol : "Administrador";
+  const op = r => `<option value="${r}" ${rol === r ? "selected" : ""}>${r}</option>`;
+
+  $("contenidoCuenta").innerHTML = `
+    <div id="previewFoto" style="width:100px;height:100px;border-radius:50%;background:#174ea6;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;overflow:hidden">${fotoTemporal ? `<img src="${fotoTemporal}" style="width:100%;height:100%;object-fit:cover">` : "👤"}</div>
+    <label>Nombre</label>
+    <input id="nombreCuenta" type="text" placeholder="Nombre completo" value="${cuenta ? escapeHTML(cuenta.nombre) : ""}">
+    <label>Correo electrónico</label>
+    <input id="correoCuenta" type="email" placeholder="correo@instituto.com" value="${cuenta ? escapeHTML(cuenta.correo) : ""}">
+    <label>Rol</label>
+    <select id="rolCuenta">${["Administrador", "Encargado de inventario", "Consulta"].map(op).join("")}</select>
+    <label>Foto de perfil</label>
+    <input id="fotoCuenta" type="file" accept="image/*">
+    <button id="guardarPerfil" class="btn-guardar">${cuenta ? "Guardar cambios" : "Crear cuenta"}</button>
+    ${cuenta ? `<button id="eliminarCuentaBtn" class="btn-cancelar" style="background:#ffe5e5;color:#c62828">Eliminar cuenta</button>` : ""}
+  `;
+
+  $("fotoCuenta").addEventListener("change", previsualizarFoto);
+  $("guardarPerfil").onclick = guardarCuenta;
+  if (cuenta) $("eliminarCuentaBtn").onclick = eliminarCuenta;
+  $("modalCuenta").classList.remove("oculto");
+}
+
+function abrirMiCuenta(){ const c = obtenerCuentaActiva(); if (c) abrirFormCuenta(c); }
+function abrirModalAgregarCuenta(){ abrirFormCuenta(null); }
+
+function previsualizarFoto(event){
+  const archivo = event.target.files[0];
+  if (!archivo) return;
+  const lector = new FileReader();
+  lector.onload = e => {
+    fotoTemporal = e.target.result;
+    const preview = $("previewFoto");
+    if (preview) preview.innerHTML = `<img src="${fotoTemporal}" style="width:100%;height:100%;object-fit:cover">`;
+  };
+  lector.readAsDataURL(archivo);
+}
+
+function guardarCuenta(){
+  const nombre = $("nombreCuenta").value.trim();
+  const correo = $("correoCuenta").value.trim();
+  const rol = $("rolCuenta").value;
+
+  if (!nombre) { alert("Ingrese el nombre."); return; }
+  if (!correo) { alert("Ingrese el correo electrónico."); return; }
+  if (!correo.includes("@")) { alert("Ingrese un correo electrónico válido."); return; }
+
+  if (cuentaEditandoId) {
+    const c = cuentas.find(x => x.id === cuentaEditandoId);
+    if (c) { c.nombre = nombre; c.correo = correo; c.rol = rol; c.foto = fotoTemporal || ""; }
+  } else {
+    const nueva = { id: Date.now().toString(), nombre, correo, rol, foto: fotoTemporal || "" };
+    cuentas.push(nueva);
+    cuentaActivaId = nueva.id;
+  }
+
+  guardarCuentas();
+  actualizarPerfil();
+  $("modalCuenta").classList.add("oculto");
+  alert("Cuenta guardada correctamente.");
+}
+
+function abrirModalCambiarCuenta(){
+  $("tituloModalCuenta").textContent = "Cambiar cuenta";
+  let contenido = `<p style="margin-bottom:10px">Selecciona la cuenta que deseas utilizar:</p>`;
+  cuentas.forEach(c => {
+    contenido += `
+      <button style="width:100%;padding:12px;margin-top:8px;border:1px solid #ddd;border-radius:7px;background:#fff;text-align:left" onclick="cambiarCuenta('${c.id}')">
+        👤 <strong>${escapeHTML(c.nombre)}</strong><br><small style="color:#777">${escapeHTML(c.correo)}</small>
+      </button>`;
+  });
+  contenido += `<button class="btn-guardar" onclick="abrirModalAgregarCuenta()">＋ Agregar cuenta</button>`;
+  $("contenidoCuenta").innerHTML = contenido;
+  $("modalCuenta").classList.remove("oculto");
+}
+
+function cambiarCuenta(id){
+  const c = cuentas.find(x => x.id === id);
+  if (!c) return;
+  cuentaActivaId = c.id;
+  guardarCuentas();
+  actualizarPerfil();
+  $("modalCuenta").classList.add("oculto");
+  alert("Cuenta cambiada correctamente.");
+}
+
+function eliminarCuenta(){
+  const c = obtenerCuentaActiva();
+  if (!c) return;
+  if (cuentas.length <= 1) { alert("No puedes eliminar la única cuenta."); return; }
+  if (!confirm("¿Deseas eliminar la cuenta de " + c.nombre + "?")) return;
+  cuentas = cuentas.filter(x => x.id !== c.id);
+  cuentaActivaId = cuentas[0].id;
+  guardarCuentas();
+  actualizarPerfil();
+  $("modalCuenta").classList.add("oculto");
+  alert("Cuenta eliminada correctamente.");
+}
+
+/* =========================================================
+   DATOS
+   ========================================================= */
+let productos = invLeerOInicializar([
+  {codigo:"P001",nombre:"Frijoles",categoria:"Granos",cantidad:25,unidad:"Kg",minimo:10,ubicacion:"Almacén A",vencimiento:"2026-12-20"},
+  {codigo:"P002",nombre:"Leche",categoria:"Lácteos",cantidad:5,unidad:"Litros",minimo:10,ubicacion:"Refrigerador",vencimiento:"2026-09-10"},
+  {codigo:"P003",nombre:"Arroz",categoria:"Granos",cantidad:30,unidad:"Kg",minimo:10,ubicacion:"Almacén B",vencimiento:"2027-01-15"}
+]);
+// CORRECCIÓN: descartar elementos dañados (null, textos, etc.) que rompían la página
+productos = productos.filter(p => p && typeof p === "object");
+
+function guardar(){ invGuardar(productos); }
+
+function minimoDe(p){
+  const v = p.minimo ?? p.stockMinimo;
+  const n = parseFloat(v);
+  return (v === undefined || v === null || v === "" || isNaN(n)) ? 5 : n;
+}
+
+function diasParaVencer(texto){
+  const t = String(texto || "").trim();
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  let f = null;
+  if (m) f = new Date(+m[1], +m[2] - 1, +m[3]);
+  else {
+    m = t.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+    if (m) f = new Date(+m[3], +m[2] - 1, +m[1]);
+  }
+  if (!f || isNaN(f.getTime())) return null;
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  return Math.round((f - hoy) / 86400000);
+}
+
+function alertas(){
+  const lista = [];
+  productos.forEach(p => {
+    if (Number(p.cantidad) <= minimoDe(p)) {
+      lista.push({ titulo: "Stock bajo", detalle: p.nombre + ": " + p.cantidad + " " + (p.unidad || "") });
+    }
+    const dias = diasParaVencer(p.vencimiento);
+    if (dias !== null) {
+      if (dias < 0) lista.push({ titulo: "Producto vencido", detalle: p.nombre + ": venció hace " + Math.abs(dias) + " día(s)" });
+      else if (dias === 0) lista.push({ titulo: "Vence hoy", detalle: p.nombre + ": vence hoy" });
+      else if (dias <= 7) lista.push({ titulo: "Próximo a vencer", detalle: p.nombre + ": vence en " + dias + " día(s)" });
+    }
+  });
+  return lista;
+}
+
+function actualizarAlertas(){
+  const lista = alertas();
+  const cantidad = lista.length;
+  $("contadorNotificaciones").textContent = cantidad;
+  $("textoAlertas").textContent = cantidad + (cantidad === 1 ? " alerta" : " alertas");
+  $("listaNotificaciones").innerHTML = cantidad ? lista.map(a => `
+    <div class="notificacion-item">
+      <span class="icono-notificacion">⚠️</span>
+      <div class="texto-notificacion"><strong>${escapeHTML(a.titulo)}</strong><span>${escapeHTML(a.detalle)}</span></div>
+    </div>`).join("") : `<p class="sin-notificaciones">No hay alertas.</p>`;
+}
+
+/* =========================================================
+   MENU LATERAL Y EVENTOS
+   ========================================================= */
+function hambAbrir(){
+  const menu = $("menuInventario");
+  if (!menu) return;
+  menu.classList.add("abierto");
+  menu.setAttribute("aria-hidden", "false");
+  $("hambFondo").classList.add("visible");
+  document.body.style.overflow = "hidden";
+}
+function hambCerrar(){
+  const menu = $("menuInventario");
+  if (menu) { menu.classList.remove("abierto"); menu.setAttribute("aria-hidden", "true"); }
+  $("hambFondo").classList.remove("visible");
+  document.body.style.overflow = "";
+}
+function hambAlternar(){
+  if ($("menuInventario").classList.contains("abierto")) hambCerrar(); else hambAbrir();
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") hambCerrar(); });
+
+$("btnNotificaciones").onclick = e => {
+  e.stopPropagation();
+  $("panelNotificaciones").classList.toggle("oculto");
+  $("menuAdmin").classList.add("oculto");
+};
+$("btnAdmin").onclick = e => {
+  e.stopPropagation();
+  $("menuAdmin").classList.toggle("oculto");
+  $("panelNotificaciones").classList.add("oculto");
+};
+$("miCuenta").onclick = () => { $("menuAdmin").classList.add("oculto"); abrirMiCuenta(); };
+$("agregarCuenta").onclick = () => { $("menuAdmin").classList.add("oculto"); abrirModalAgregarCuenta(); };
+$("cambiarCuenta").onclick = () => { $("menuAdmin").classList.add("oculto"); abrirModalCambiarCuenta(); };
+$("salirAdmin").onclick = () => { $("menuAdmin").classList.add("oculto"); alert("Sesión cerrada."); };
+$("cerrarCuenta").onclick = () => $("modalCuenta").classList.add("oculto");
+$("cerrarModal").onclick = () => $("modalProducto").classList.add("oculto");
+
+document.onclick = e => {
+  if (!e.target.closest(".notificaciones")) $("panelNotificaciones").classList.add("oculto");
+  if (!e.target.closest("#btnAdmin") && !e.target.closest("#menuAdmin")) $("menuAdmin").classList.add("oculto");
+};
+
+function mostrarModulo(modulo){
+  if (modulo === "configuracion") configuracion();
+  else catalogo();
+}
+
+/* =========================================================
+   CATALOGO
+   ========================================================= */
+function catalogo(){
+  $("tituloModulo").textContent = "Catálogo de Productos";
+  $("subtituloModulo").textContent = "Gestiona el inventario de alimentos";
+
+  $("contenidoModulo").innerHTML = `
+    <div class="encabezado-modulo"><span class="icono-grande">📦</span><h2>Catálogo de Productos</h2></div>
+
+    <div class="barra-superior">
+      <div class="busqueda"><span class="lupa">⌕</span><input id="buscarProducto" placeholder="Buscar productos..."></div>
+      <div class="filtro">
+        <select id="filtroCategoria">
+          <option value="">Todas las categorías</option>
+          <option>Lácteos</option><option>Granos</option><option>Proteínas</option><option>Verduras</option><option>Panadería</option>
+        </select>
+      </div>
+      <button id="nuevoProducto" class="btn-nuevo">＋ Nuevo Producto</button>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table>
+        <thead><tr>
+          <th>Código</th><th>Producto</th><th>Categoría</th><th>Cantidad</th>
+          <th>Estado</th><th>Ubicación</th><th>Vencimiento</th><th>Acciones</th>
+        </tr></thead>
+        <tbody id="listaProductos"></tbody>
+      </table>
+    </div>
+  `;
+
+  // Agregar al filtro las categorías que vienen de otras páginas
+  const filtroCat = $("filtroCategoria");
+  const yaEnFiltro = new Set([...filtroCat.options].map(o => o.textContent.trim().toLowerCase()));
+  productos.forEach(p => {
+    const c = String(p.categoria || "").trim();
+    if (c && !yaEnFiltro.has(c.toLowerCase())) {
+      const opcion = document.createElement("option");
+      opcion.textContent = c;
+      filtroCat.appendChild(opcion);
+      yaEnFiltro.add(c.toLowerCase());
+    }
+  });
+
+  $("nuevoProducto").onclick = () => $("modalProducto").classList.remove("oculto");
+  $("buscarProducto").oninput = filtrar;
+  $("filtroCategoria").onchange = filtrar;
+
+  mostrarProductos();
+}
+
+function mostrarProductos(lista = productos){
+  $("listaProductos").innerHTML = lista.map(p => {
+    const bajo = Number(p.cantidad) <= minimoDe(p);
+    return `
+      <tr>
+        <td>${escapeHTML(p.codigo || "")}</td>
+        <td><span class="nombre-producto">${escapeHTML(p.nombre || "")}</span><span class="empresa">Inventario Escolar</span></td>
+        <td>${escapeHTML(p.categoria || "")}</td>
+        <td>${escapeHTML(p.cantidad ?? "")} ${escapeHTML(p.unidad || "")}</td>
+        <td><span class="estado ${bajo ? "bajo" : "normal"}">${bajo ? "⚠ Stock bajo" : "✓ Normal"}</span></td>
+        <td>${escapeHTML(p.ubicacion || "")}</td>
+        <td>${escapeHTML(p.vencimiento || "")}</td>
+        <td>
+          <button class="btn-detalles" onclick="verProducto('${escapeHTML(p.codigo || "")}')">Ver</button>
+          <button class="btn-eliminar" onclick="eliminarProducto('${escapeHTML(p.codigo || "")}')" title="Eliminar producto">🗑️</button>
+        </td>
+      </tr>`;
+  }).join("");
+}
+
+function filtrar(){
+  const texto = $("buscarProducto").value.toLowerCase();
+  const categoria = $("filtroCategoria").value;
+  mostrarProductos(productos.filter(p =>
+    String(p.nombre || "").toLowerCase().includes(texto) && (!categoria || p.categoria === categoria)
+  ));
+}
+
+function verProducto(codigo){
+  localStorage.setItem("productoSeleccionado", codigo);
+  window.location.href = "detalle.html";
+}
+
+function eliminarProducto(codigo){
+  const producto = productos.find(p => p.codigo === codigo);
+  if (!producto) { alert("No se encontró el producto seleccionado."); return; }
+  if (!confirm('¿Deseas eliminar únicamente el producto "' + producto.nombre + '" del catálogo?')) return;
+
+  productos = productos.filter(p => p.codigo !== codigo);
+  guardar();
+  if (localStorage.getItem("productoSeleccionado") === codigo) localStorage.removeItem("productoSeleccionado");
+
+  actualizarAlertas();
+  catalogo();
+  alert("Producto eliminado correctamente.");
+}
+
+/* Código correlativo: P001, P002, P003... */
+function generarCodigoSecuencial(){
+  let maxNum = 0;
+  productos.forEach(p => {
+    if (p.codigo && String(p.codigo).startsWith("P")) {
+      const num = parseInt(String(p.codigo).substring(1), 10);
+      if (!isNaN(num) && num > maxNum) maxNum = num;
+    }
+  });
+  return "P" + String(maxNum + 1).padStart(3, "0");
+}
+
+function calcularMinimoPantalla(){
+  const cantidad = Number($("cantidadProducto").value);
+  $("minimoProducto").value = cantidad > 0 ? Math.max(10, Math.round(cantidad * 0.20)) : "";
+}
+
+$("formProducto").onsubmit = e => {
+  e.preventDefault();
+
+  const cantidadIngresada = Number($("cantidadProducto").value);
+  const minimoCalculado = Number($("minimoProducto").value) || Math.max(10, Math.round(cantidadIngresada * 0.20));
+  const nombreNuevo = $("nombreProducto").value.trim();
+
+  const existente = invBuscar(productos, nombreNuevo);
+  if (existente && invNorm(existente.nombre) === invNorm(nombreNuevo)) {
+    alert('Ya existe un producto llamado "' + nombreNuevo + '". Para agregarle cantidad, regístralo como una Entrada.');
+    return;
+  }
+
+  const p = {
+    codigo: generarCodigoSecuencial(),
+    nombre: nombreNuevo,
+    categoria: $("categoriaProducto").value,
+    cantidad: cantidadIngresada,
+    unidad: $("unidadProducto").value,
+    minimo: minimoCalculado,
+    ubicacion: $("ubicacionProducto").value.trim(),
+    vencimiento: $("vencimientoProducto").value
+  };
+
+  productos.push(p);
+  guardar();
+
+  invRegistrarEntradaTabla({
+    nombre: p.nombre, categoria: p.categoria, cantidad: p.cantidad, unidad: p.unidad,
+    ubicacion: p.ubicacion, vencimiento: p.vencimiento
+  });
+  invAnotarMov("entrada", p.nombre, p.cantidad, p.unidad, "Producto nuevo desde el catálogo");
+
+  $("modalProducto").classList.add("oculto");
+  e.target.reset();
+  actualizarAlertas();
+  catalogo();
+
+  alert("Producto agregado correctamente con el código: " + p.codigo + "\n\nTambién quedó registrado en Entradas y en el Panel de Control.");
+};
+
+/* CONFIGURACION */
+function configuracion(){
+  $("tituloModulo").textContent = "Configuración";
+  $("subtituloModulo").textContent = "Configuración del sistema";
+  $("contenidoModulo").innerHTML = `
+    <div class="encabezado-modulo"><span class="icono-grande">⚙️</span><h2>Configuración</h2></div>
+    <div class="card"><h3>⚙️ Inventario Escolar</h3><p>Sistema de control de inventario.</p></div>
+  `;
+}
+
+/* Actualizar automáticamente al volver a esta página */
+function recargarDesdeInventario(){
+  productos = invLeer().filter(p => p && typeof p === "object");
+  actualizarAlertas();
+  if ($("listaProductos")) filtrar();
+}
+window.addEventListener("focus", recargarDesdeInventario);
+window.addEventListener("pageshow", recargarDesdeInventario);
+window.addEventListener("storage", e => {
+  if (["productosInventario", "productos", "inventarioEscolar"].includes(e.key)) recargarDesdeInventario();
+});
+
+/* INICIO: el catálogo se dibuja antes que las alertas, y cada paso se protege por separado */
+try { actualizarPerfil(); }  catch (e) { console.error("Perfil:", e); }
+try { catalogo(); }          catch (e) { console.error("Catálogo:", e); }
+try { actualizarAlertas(); } catch (e) { console.error("Alertas:", e); }
+</script>
+
+</body>
+</html>

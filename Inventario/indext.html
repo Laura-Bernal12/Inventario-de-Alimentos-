@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario Escolar - Reportes de Entradas</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    section.card.table-card { width: 100%; max-width: 100%; min-width: 0; }
+    .table-card { overflow: hidden; }
+    .table-card > div { max-width: 100%; }
+    .data-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+    .data-table th, .data-table td { padding: 10px 12px; text-align: left; white-space: nowrap; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(15, 23, 42, 0.55); display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+    .modal-overlay.hidden { display: none !important; }
+    .modal-content { width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; background: white; border-radius: 14px; padding: 24px; }
+    .modal-content input, .modal-content select { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 14px; border: 1px solid #cbd5e1; border-radius: 7px; }
+    .modal-content label { display: block; font-weight: 600; font-size: 14px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .dropdown-btn { display: block; width: 100%; padding: 11px 16px; text-align: left; border: none; background: white; cursor: pointer; color: #334155; }
+    .dropdown-btn:hover { background: #f1f5f9; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 768px) {
+      .main-content { min-width: 0; width: 100%; }
+      .top-header { gap: 12px; flex-wrap: wrap; }
+      .table-header { gap: 12px; flex-wrap: wrap; }
+      .table-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    }
+
+    /* ===== HAMBURGUESA (igual a la del Panel de Control) ===== */
+    /* Se oculta el menú lateral anterior (sigue en el HTML para que script.js no falle) */
+    #menuToggle, #overlay, #sidebar { display: none !important; }
+    .main-content { margin-left: 0 !important; width: 100% !important; max-width: 100%; }
+    .hamb-grupo { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .hamb-btn { width: 44px; height: 44px; flex-shrink: 0; border: 0; border-radius: 8px; background: #f3e8ff; color: #7e22ce; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .2s; }
+    .hamb-btn:hover { background: #e9d5ff; }
+    .hamb-fondo { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .4); z-index: 9998; }
+    .hamb-fondo.visible { display: block; }
+    #menuInventario { position: fixed; top: 0; bottom: 0; left: 0; width: min(320px, 86vw); height: 100dvh; background: #fff; overflow-y: auto; border-radius: 0 14px 14px 0; z-index: 9999; box-shadow: 8px 0 28px rgba(0, 0, 0, .14); padding-bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-105%); visibility: hidden; transition: transform .25s ease, visibility .25s; font-family: inherit; }
+    #menuInventario.abierto { transform: translateX(0); visibility: visible; }
+    .hamb-cab { padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .hamb-logo-grupo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .hamb-logo { width: 48px; height: 48px; flex-shrink: 0; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; background: #fff; display: flex; align-items: center; justify-content: center; }
+    .hamb-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .hamb-titulo { margin: 0; font-size: 16px; font-weight: 700; color: #1f2937; }
+    .hamb-sub { margin: 0; font-size: 12px; color: #6b7280; }
+    .hamb-cerrar { min-width: 48px; min-height: 48px; border: 0; border-radius: 12px; background: #f3f4f6; font-size: 30px; line-height: 1; color: #374151; cursor: pointer; }
+    .hamb-cerrar:hover { background: #e5e7eb; }
+    .hamb-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 54px; padding: 16px 20px; border: 0; background: transparent; color: #4b5563; font-family: inherit; font-size: 16px; text-align: left; text-decoration: none; cursor: pointer; transition: background .2s, color .2s; }
+    .hamb-item:hover { background: #f3f4f6; }
+    .hamb-item.activo { background: #f3e8ff; color: #7e22ce; font-weight: 600; }
+    .hamb-sesion { border-top: 1px solid #e5e7eb; }
+    .hamb-sesion .hamb-item:hover { background: #fef2f2; color: #dc2626; }
+
+    /* ===== ARREGLO DE PANTALLA (va al final para que tenga prioridad) ===== */
+    body { background: #f1f5f9; margin: 0; }
+    .main-content { padding: 24px 32px; background: #f1f5f9; min-height: 100vh; }
+    .top-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .top-header h1 { margin: 0; font-size: 28px; color: #0f172a; }
+    .subtitle { margin: 2px 0 0; font-size: 14px; color: #64748b; }
+    .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+    .card { background: #fff; border-radius: 14px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(15, 23, 42, .08); }
+    .card h3 { margin: 0 0 14px; font-size: 20px; color: #0f172a; }
+    .chart-container { position: relative; height: 260px; width: 100%; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .table-header h3 { margin: 0; }
+    .table-actions { display: flex; align-items: center; gap: 12px; }
+    .search-input { padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; min-width: 200px; }
+    .btn-add { background: #10b981; color: #fff; border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .btn-add:hover { background: #059669; }
+    .btn-secondary { background: #e2e8f0; color: #334155; border: 0; border-radius: 8px; padding: 10px 18px; cursor: pointer; }
+    .data-table th { color: #059669; font-weight: 700; border-bottom: 1px solid #334155; }
+    .data-table td { border-bottom: 1px solid #e5e7eb; color: #1e293b; }
+    .data-table td:nth-child(2) { color: #059669; font-weight: 700; }
+    .data-table td:last-child button { background: #ef4444; color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+    .data-table td:last-child button.btn-editar-ent { background: #3b82f6; margin-right: 6px; }
+    .data-table td:last-child button.btn-editar-ent:hover { background: #2563eb; }
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } .main-content { padding: 16px; } }
+
+    /* ===== Formulario "Agregar Nuevo Producto" ===== */
+    .modal-content h2 { margin: 0 0 18px; font-size: 22px; color: #0f172a; }
+    .modal-content label { font-weight: 400; font-size: 14px; color: #64748b; }
+    .modal-content input, .modal-content select { font-size: 15px; color: #0f172a; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; }
+    .modal-content input[readonly] { background: #f8fafc; cursor: not-allowed; }
+  </style>
+</head>
+
+<body>
+  <!-- HAMBURGUESA (menú del Panel de Control) -->
+  <div id="hambFondo" class="hamb-fondo" onclick="hambCerrar()"></div>
+
+  <div id="menuInventario" aria-hidden="true">
+    <div class="hamb-cab">
+      <div class="hamb-logo-grupo">
+        <div class="hamb-logo"><img src="./img/logo-instituto.jpg" alt="Logo del Instituto"></div>
+        <div>
+          <h1 class="hamb-titulo">Inventario</h1>
+          <p class="hamb-sub">Escolar</p>
+        </div>
+      </div>
+      <button type="button" class="hamb-cerrar" onclick="hambCerrar()" aria-label="Cerrar menú">×</button>
+    </div>
+
+    <a href="alimentos.html" class="hamb-item" onclick="hambCerrar()"><span>🏠</span><span>Panel de Control</span></a>
+    <a href="catalogo.html" class="hamb-item" onclick="hambCerrar()"><span>📦</span><span>Catálogo</span></a>
+    <a href="entradas.html" class="hamb-item" onclick="hambCerrar()"><span>🍽️</span><span>Menú</span></a>
+    <a href="indext.html" class="hamb-item activo" onclick="hambCerrar()"><span>⬆️</span><span>Entradas</span></a>
+    <a href="index1.html" class="hamb-item" onclick="hambCerrar()"><span>⬇️</span><span>Salidas</span></a>
+    <button type="button" class="hamb-item" onclick="hambConfiguracion()"><span>⚙️</span><span>Configuración</span></button>
+
+    <div class="hamb-sesion">
+      <button type="button" class="hamb-item" onclick="hambCerrar(); logoutAccount();"><span>🚪</span><span>Cerrar sesión</span></button>
+    </div>
+  </div>
+
+  <!-- Menú lateral anterior: se deja oculto para que script.js siga funcionando -->
+  <button class="menu-toggle" id="menuToggle" type="button">☰</button>
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-section" style="display:flex;align-items:center;gap:10px;">
+      <img src="https://tse3.mm.bing.net/th/id/OIP.YmIOGyQ215MnMmocs-6WnAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Logo Instituto" style="width:45px;height:45px;object-fit:contain;">
+      <h2>Inventario<br><span>Escolar</span></h2>
+    </div>
+
+    <nav class="nav-menu">
+      <a href="alimentos.html" class="nav-item">📊 Panel de Control</a>
+      <a href="catalogo.html" class="nav-item">📄 Catálogo</a>
+      <a href="entradas.html" class="nav-item">📋 Menú</a>
+      <a href="indext.html" class="nav-item active">⬆️ Entradas</a>
+      <a href="Index1.html" class="nav-item">⬇️ Salidas</a>
+      <a href="#" class="nav-item" onclick="abrirConfiguracion(); return false;">⚙️ Configuración</a>
+    </nav>
+
+    <div class="logout">
+      <a href="#" onclick="logoutAccount(); return false;">🟧 Cerrar Sesión</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="hamb-grupo">
+        <button type="button" class="hamb-btn" onclick="hambAlternar()" aria-label="Abrir menú">☰</button>
+
+        <div>
+          <h1>Reportes de Entradas</h1>
+          <p class="subtitle">Sistema de Control de Alimentos Escolares</p>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div style="position:relative;">
+          <button id="bellBtn" type="button" aria-label="Mostrar notificaciones"
+                  style="background:none;border:none;cursor:pointer;position:relative;font-size:20px;padding:5px;">
+            🔔
+            <span id="contadorAlertas"
+                  style="position:absolute;top:0;right:0;background:#e11d48;color:white;font-size:10px;font-weight:bold;min-width:16px;height:16px;padding:0 3px;display:flex;align-items:center;justify-content:center;border-radius:50%;">0</span>
+          </button>
+
+          <div id="bellDropdown"
+               style="display:none;position:absolute;right:0;top:45px;background:#fff;width:280px;max-width:85vw;box-shadow:0 10px 25px rgba(0,0,0,.15);border-radius:12px;padding:16px;z-index:1000;color:#333;text-align:left;border:1px solid #f1f5f9;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="font-size:15px;color:#0f172a;">Notificaciones</strong>
+              <span id="textoAlertas" style="font-size:12px;color:#64748b;">Alertas del inventario</span>
+            </div>
+
+            <div id="contenidoNotificaciones" style="background:#f8fafc;padding:10px;border-radius:8px;">
+              <strong style="display:block;font-size:14px;color:#1e293b;">Inventario escolar</strong>
+              <span style="font-size:12px;color:#64748b;">Revisa los productos próximos a vencer y el stock bajo.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="account-container usuario" style="position:relative;">
+          <div class="user-profile" onclick="toggleMenuCuenta(event)"
+               style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:6px 12px;background:#f1f5f9;border-radius:20px;">
+            <div class="avatar" id="avatarContainer"
+                 style="font-size:18px;width:30px;height:30px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#cbd5e1;">
+              <img id="fotoAdministrador" src="" alt="Foto de perfil" class="hidden" style="width:100%;height:100%;object-fit:cover;">
+              <span id="iconoAdministrador">👤</span>
+            </div>
+
+            <div class="user-info-header" style="text-align:left;line-height:1.2;">
+              <span id="nombreAdministrador" style="display:block;font-weight:bold;font-size:13px;color:#0f172a;">Admin</span>
+              <small id="rolAdministrador" style="font-size:11px;color:#64748b;">Administrador</small>
+            </div>
+
+            <span style="font-size:12px;color:#64748b;">▼</span>
+          </div>
+
+          <div id="menuCuenta" class="edit-dropdown account-dropdown hidden"
+               style="position:absolute;right:0;top:50px;background:#fff;width:240px;box-shadow:0 10px 25px rgba(0,0,0,.15);border-radius:12px;padding:8px 0;z-index:1000;color:#333;border:1px solid #f1f5f9;">
+            <div style="padding:10px 16px;border-bottom:1px solid #f1f5f9;margin-bottom:4px;">
+              <p id="menuNombre" style="margin:0;font-weight:bold;color:#0f172a;font-size:14px;">Admin</p>
+              <p id="menuCorreo" style="margin:0;font-size:12px;color:#64748b;">admin@instituto.com</p>
+            </div>
+
+            <button class="dropdown-btn" type="button" onclick="abrirMiCuenta()">👤 Mi cuenta</button>
+            <button class="dropdown-btn" type="button" onclick="abrirAgregarCuenta()">➕ Agregar cuenta</button>
+            <button class="dropdown-btn" type="button" onclick="abrirCambiarCuenta()">🔄 Cambiar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="charts-grid">
+      <div class="card chart-card">
+        <h3>Entradas de alimentos</h3>
+        <div class="chart-container"><canvas id="lineChart"></canvas></div>
+      </div>
+
+      <div class="card chart-card">
+        <h3>Productos recibidos</h3>
+        <div class="chart-container donut-box"><canvas id="donutChart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="table-header">
+        <h3>Registro de Entradas</h3>
+
+        <div class="table-actions">
+          <input type="text" id="searchInput" placeholder="🔎 Filtrar..." class="search-input" aria-label="Buscar entradas">
+          <button id="openModalBtn" class="btn-add" type="button">+ Agregar</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Proveedor</th>
+              <th>Responsable</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaEntradasBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal para agregar una entrada -->
+  <div id="addProductModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2>Agregar Nuevo Producto</h2>
+
+      <form id="addProductForm">
+        <label for="inputProducto">Producto</label>
+        <input type="text" id="inputProducto" name="producto" required>
+
+        <label for="inputCategoria">Categoría</label>
+        <select id="inputCategoria" name="categoria" required>
+          <option value="">Selecciona una categoría</option>
+          <option value="Lácteos">Lácteos</option>
+          <option value="Granos">Granos</option>
+          <option value="Proteínas">Proteínas</option>
+          <option value="Verduras">Verduras</option>
+          <option value="Panadería">Panadería</option>
+          <option value="Aceites">Aceites</option>
+          <option value="Frutas">Frutas</option>
+          <option value="Bebidas">Bebidas</option>
+          <option value="Otros">Otros</option>
+        </select>
+
+        <label for="inputCantidad">Cantidad</label>
+        <input type="text" id="inputCantidad" name="cantidad" placeholder="Ej. 50 L o 30 Kg" required>
+
+        <label for="inputFecha">Fecha</label>
+        <input type="date" id="inputFecha" name="fecha" required>
+
+        <label for="inputHora">Hora</label>
+        <input type="time" id="inputHora" name="hora" required>
+
+        <label for="inputProveedor">Proveedor</label>
+        <input type="text" id="inputProveedor" name="proveedor" value="Ministerio de Educación" required>
+
+        <label for="inputResponsable">Responsable</label>
+        <input type="text" id="inputResponsable" name="responsable" value="" readonly title="Es la cuenta que inició sesión" required>
+
+        <label for="inputUbicacion">Ubicación</label>
+        <input type="text" id="inputUbicacion" name="ubicacion" required>
+
+        <label for="inputVencimiento">Fecha de vencimiento</label>
+        <input type="date" id="inputVencimiento" name="vencimiento" required>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelModalBtn" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-add">Guardar registro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de cuenta -->
+  <div id="modalCuenta" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 id="tituloModalCuenta">Mi cuenta</h2>
+
+      <label for="fotoCuenta">Foto de perfil</label>
+      <input type="file" id="fotoCuenta" accept="image/*" onchange="previsualizarFoto(event)">
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <img id="previewFoto" src="" alt="Vista previa" class="hidden" style="width:70px;height:70px;object-fit:cover;border-radius:50%;">
+        <span id="previewIcono" style="font-size:32px;">👤</span>
+      </div>
+
+      <label for="cuentaNombre">Nombre</label>
+      <input type="text" id="cuentaNombre" required>
+
+      <label for="cuentaCorreo">Correo electrónico</label>
+      <input type="email" id="cuentaCorreo" required>
+
+      <label for="cuentaRol">Rol</label>
+      <input type="text" id="cuentaRol" required>
+
+      <div class="modal-actions">
+        <button type="button" onclick="cerrarModal('modalCuenta')">Cancelar</button>
+        <button type="button" onclick="guardarCuenta()">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para cambiar de cuenta -->
+  <div id="modalCambiarCuenta" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2>Cambiar cuenta</h2>
+      <p>Selecciona una cuenta para continuar.</p>
+
+      <div id="listaCuentas"></div>
+
+      <div class="modal-actions">
+        <button type="button" onclick="cerrarModal('modalCambiarCuenta')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Funciones de interfaz que utiliza este HTML -->
+  <script>
+    function toggleMenuCuenta(event) {
+      if (event) event.stopPropagation();
+      const menu = document.getElementById('menuCuenta');
+      if (!menu) return;
+      menu.classList.toggle('hidden');
+    }
+
+    function cerrarModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function logoutAccount() {
+      const confirmar = confirm('¿Deseas cerrar sesión?');
+      if (!confirmar) return;
+      localStorage.removeItem('cuentaActivaInventario');
+      localStorage.removeItem('userEmail');
+      window.location.href = 'login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const abrir = document.getElementById('openModalBtn');
+      const cancelar = document.getElementById('cancelModalBtn');
+      const modal = document.getElementById('addProductModal');
+      const campana = document.getElementById('bellBtn');
+      const notificaciones = document.getElementById('bellDropdown');
+      const buscar = document.getElementById('searchInput');
+
+      if (abrir && modal) {
+        abrir.addEventListener('click', function () { modal.classList.remove('hidden'); });
+      }
+
+      if (cancelar && modal) {
+        cancelar.addEventListener('click', function () { modal.classList.add('hidden'); });
+      }
+
+      if (modal) {
+        modal.addEventListener('click', function (event) {
+          if (event.target === modal) modal.classList.add('hidden');
+        });
+      }
+
+      if (campana && notificaciones) {
+        campana.addEventListener('click', function (event) {
+          event.stopPropagation();
+          notificaciones.style.display = notificaciones.style.display === 'block' ? 'none' : 'block';
+        });
+      }
+
+      document.addEventListener('click', function (event) {
+        const menu = document.getElementById('menuCuenta');
+        if (menu && !menu.parentElement.contains(event.target)) {
+          menu.classList.add('hidden');
+        }
+
+        if (notificaciones && campana && !notificaciones.contains(event.target) && !campana.contains(event.target)) {
+          notificaciones.style.display = 'none';
+        }
+      });
+
+      if (buscar) {
+        buscar.addEventListener('input', function () {
+          const filtro = buscar.value.toLowerCase().trim();
+          const filas = document.querySelectorAll('#tablaEntradasBody tr');
+          filas.forEach(function (fila) {
+            fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? '' : 'none';
+          });
+        });
+      }
+    });
+  </script>
+
+  <script src="script.js"></script>
+
+<!-- Botón Editar y notificaciones de la campana -->
+  <script>
+/* editar-entradas.js
+   Para indext.html (Entradas). Agrega:
+   1) un botón ✏️ Editar junto al de eliminar en cada fila (edita toda la información)
+   2) las notificaciones de la campana (stock bajo, vencidos y próximos a vencer)
+   Va en la misma carpeta que indext.html. */
+(function () {
+  "use strict";
+
+  var CLAVE = "entradasEscolar";
+  var CLAVES_PROD = ["productosInventario", "productos", "inventarioEscolar"];
+  var CATEGORIAS = ["Lácteos", "Granos", "Proteínas", "Verduras", "Panadería", "Aceites", "Frutas", "Bebidas", "Otros"];
+
+  /* ---------- utilidades ---------- */
+  function norm(t) { return String(t == null ? "" : t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase(); }
+  function esc(t) { return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function leer(k) { try { var v = JSON.parse(localStorage.getItem(k) || "null"); return Array.isArray(v) ? v : null; } catch (e) { return null; } }
+  function num(v) { var m = String(v == null ? "" : v).replace(",", ".").match(/\d+(?:\.\d+)?/); return m ? Number(m[0]) : NaN; }
+  function und(v) { return String(v == null ? "" : v).replace(/^[\d.,\s-]+/, "").trim(); }
+  function red(n) { return Math.round(n * 1000) / 1000; }
+
+  /* ---------- unidades ---------- */
+  var U = { lb: ["lb", "lbs", "libra", "libras"], kg: ["kg", "kgs", "kilo", "kilos"], g: ["g", "gr", "gramo", "gramos"], l: ["l", "lt", "lts", "litro", "litros"], ml: ["ml"], un: ["un", "unidad", "unidades", "pza", "pzas", "pieza", "piezas"] };
+  var F = { lb: [453.592, "p"], kg: [1000, "p"], g: [1, "p"], l: [1000, "v"], ml: [1, "v"], un: [1, "u"] };
+  var BONITO = { lb: "Libras", kg: "Kg", g: "Gramos", l: "Litros", ml: "ml", un: "Unidades" };
+  function uk(u) { var x = norm(u).replace(/\./g, ""); for (var k in U) if (U[k].indexOf(x) > -1) return k; return x; }
+  function conv(c, de, a) {
+    var d = uk(de), t = uk(a);
+    if (!d || !t || d === t) return c;
+    var A = F[d], B = F[t];
+    if (!A || !B || A[1] !== B[1]) return null;
+    return c * A[0] / B[0];
+  }
+
+  /* ---------- productos del inventario ---------- */
+  function productos() {
+    for (var i = 0; i < CLAVES_PROD.length; i++) {
+      var v = leer(CLAVES_PROD[i]);
+      if (v) return v.filter(function (p) { return p && typeof p === "object"; });
+    }
+    return [];
+  }
+  function guardarProductos(lista) {
+    var t = JSON.stringify(lista);
+    CLAVES_PROD.forEach(function (k) { localStorage.setItem(k, t); });
+  }
+  function buscarProd(lista, nombre) {
+    var n = norm(nombre);
+    if (!n) return null;
+    var nom = function (p) { return norm(p.nombre || p.producto); };
+    var ex = lista.filter(function (p) { return nom(p) === n; })[0];
+    if (ex) return ex;
+    var par = lista.filter(function (p) { var m = nom(p); return m && (m.indexOf(n + " ") === 0 || n.indexOf(m + " ") === 0); });
+    return par.length === 1 ? par[0] : null;
+  }
+  function codigoNuevo(lista) {
+    var max = 0;
+    lista.forEach(function (p) { var m = String(p.codigo || "").toUpperCase().match(/^P(\d+)$/); if (m && +m[1] > max) max = +m[1]; });
+    return "P" + String(max + 1).padStart(3, "0");
+  }
+
+  /* Ajusta el inventario por lo que cambió en la entrada editada */
+  function ajustarInventario(vieja, nueva) {
+    var ps = productos(), aviso = false;
+    var nOld = num(vieja.cantidad), uOld = und(vieja.cantidad);
+    var nNew = num(nueva.cantidad), uNew = und(nueva.cantidad);
+    var pOld = buscarProd(ps, vieja.producto || vieja.nombre);
+    var pNew = buscarProd(ps, nueva.producto);
+
+    function cambiar(p, n, u, signo) {
+      var c = conv(n, u || p.unidad, p.unidad);
+      if (c === null) { aviso = true; return; }
+      p.cantidad = red(Math.max(0, (num(p.cantidad) || 0) + signo * c));
+    }
+
+    if (pOld && pOld === pNew) {
+      var a = conv(nOld, uOld || pOld.unidad, pOld.unidad), b = conv(nNew, uNew || pOld.unidad, pOld.unidad);
+      if (a === null || b === null) aviso = true;
+      else pOld.cantidad = red(Math.max(0, (num(pOld.cantidad) || 0) - a + b));
+    } else {
+      if (pOld) cambiar(pOld, nOld, uOld, -1);
+      if (pNew) cambiar(pNew, nNew, uNew, +1);
+      else {
+        pNew = {
+          codigo: codigoNuevo(ps), nombre: nueva.producto, categoria: nueva.categoria,
+          cantidad: red(nNew), unidad: BONITO[uk(uNew)] || uNew || "Unidades",
+          minimo: Math.max(10, Math.round(nNew * 0.20)), ubicacion: nueva.ubicacion, vencimiento: nueva.vencimiento
+        };
+        ps.push(pNew);
+      }
+    }
+    if (pNew) {
+      if (nueva.categoria) pNew.categoria = nueva.categoria;
+      if (nueva.ubicacion) pNew.ubicacion = nueva.ubicacion;
+      if (nueva.vencimiento) pNew.vencimiento = nueva.vencimiento;
+    }
+    guardarProductos(ps);
+    if (aviso) alert("Algunas unidades no se pudieron convertir; revisa la cantidad en el Catálogo.");
+  }
+
+  /* ---------- localizar el registro de una fila ---------- */
+  function sigFila(tr) {
+    var td = tr.querySelectorAll("td"), a = [];
+    for (var i = 0; i < 6; i++) a.push(td[i] ? (td[i].dataset.orig != null ? td[i].dataset.orig : td[i].textContent) : "");
+    return a.map(norm).join("|");
+  }
+  function sigReg(r) { return [r.producto || r.nombre, r.cantidad, r.fecha, r.hora, r.proveedor, r.responsable].map(norm).join("|"); }
+  function indiceDe(lista, tr) {
+    var firma = sigFila(tr), antes = 0, filas = document.querySelectorAll("#tablaEntradasBody tr");
+    for (var i = 0; i < filas.length && filas[i] !== tr; i++) if (sigFila(filas[i]) === firma) antes++;
+    for (var j = 0; j < lista.length; j++) {
+      if (lista[j] && sigReg(lista[j]) === firma) { if (antes === 0) return j; antes--; }
+    }
+    return -1;
+  }
+
+  /* ---------- estilos y ventana de edición ---------- */
+  var css = document.createElement("style");
+  css.textContent = ".data-table td:last-child button.btn-editar-ent{background:#3b82f6;margin-right:6px}" +
+    ".data-table td:last-child button.btn-editar-ent:hover{background:#2563eb}";
+  document.head.appendChild(css);
+
+  function campo(id, texto, tipo, extra) {
+    return '<label for="' + id + '">' + texto + '</label><input type="' + tipo + '" id="' + id + '" ' + (extra || "") + '>';
+  }
+
+  var modal = document.createElement("div");
+  modal.id = "editEntradaModal";
+  modal.className = "modal-overlay hidden";
+  modal.innerHTML = '<div class="modal-content"><h2>Editar entrada</h2><form id="editEntradaForm">' +
+    campo("edProducto", "Producto", "text", "required") +
+    '<label for="edCategoria">Categoría</label><select id="edCategoria"></select>' +
+    campo("edCantidad", "Cantidad que entró", "text", 'placeholder="Ej. 50 L o 30 Kg" required') +
+    campo("edFecha", "Fecha", "date") +
+    campo("edHora", "Hora", "time") +
+    campo("edProveedor", "Proveedor", "text") +
+    campo("edResponsable", "Responsable", "text") +
+    campo("edUbicacion", "Ubicación", "text") +
+    campo("edVencimiento", "Fecha de vencimiento", "date") +
+    '<div class="modal-actions"><button type="button" id="edCancelar" class="btn-secondary">Cancelar</button>' +
+    '<button type="submit" class="btn-add">Guardar cambios</button></div></form></div>';
+  document.body.appendChild(modal);
+
+  var editando = -1;
+  function $(id) { return document.getElementById(id); }
+
+  function abrir(tr) {
+    var lista = leer(CLAVE) || [];
+    var idx = indiceDe(lista, tr);
+    if (idx < 0) { alert("No se encontró este registro en los datos guardados."); return; }
+    var r = lista[idx];
+    editando = idx;
+
+    var cat = r.categoria || "";
+    var cats = CATEGORIAS.slice();
+    if (cat && cats.indexOf(cat) < 0) cats.unshift(cat);
+    $("edCategoria").innerHTML = '<option value="">Sin categoría</option>' +
+      cats.map(function (c) { return '<option value="' + esc(c) + '"' + (c === cat ? " selected" : "") + '>' + esc(c) + '</option>'; }).join("");
+
+    $("edProducto").value = r.producto || r.nombre || "";
+    $("edCantidad").value = r.cantidad || ((r.cantidadNumero != null ? r.cantidadNumero : "") + " " + (r.unidad || "")).trim();
+    $("edFecha").value = r.fecha || "";
+    $("edHora").value = r.hora || "";
+    $("edProveedor").value = r.proveedor || "";
+    $("edResponsable").value = r.responsable || "";
+    $("edUbicacion").value = r.ubicacion || "";
+    $("edVencimiento").value = r.vencimiento || "";
+    modal.classList.remove("hidden");
+  }
+
+  $("edCancelar").onclick = function () { modal.classList.add("hidden"); };
+  modal.addEventListener("click", function (e) { if (e.target === modal) modal.classList.add("hidden"); });
+
+  $("editEntradaForm").onsubmit = function (e) {
+    e.preventDefault();
+    var lista = leer(CLAVE) || [];
+    var r = lista[editando];
+    if (!r) { alert("No se encontró el registro."); return; }
+
+    var nueva = {
+      producto: $("edProducto").value.trim(),
+      categoria: $("edCategoria").value,
+      cantidad: $("edCantidad").value.trim(),
+      fecha: $("edFecha").value || r.fecha || "",
+      hora: $("edHora").value || r.hora || "",
+      proveedor: $("edProveedor").value.trim(),
+      responsable: $("edResponsable").value.trim(),
+      ubicacion: $("edUbicacion").value.trim(),
+      vencimiento: $("edVencimiento").value || r.vencimiento || ""
+    };
+    var n = num(nueva.cantidad);
+    if (!nueva.producto) { alert("Escribe el nombre del producto."); return; }
+    if (!(n > 0)) { alert("Escribe una cantidad válida, por ejemplo 10 Kg."); return; }
+
+    if (r.inventarioAplicado !== false) ajustarInventario(r, nueva);
+
+    for (var k in nueva) r[k] = nueva[k];
+    if (r.nombre !== undefined) r.nombre = nueva.producto;
+    r.cantidadNumero = red(n);
+    localStorage.setItem(CLAVE, JSON.stringify(lista));
+
+    modal.classList.add("hidden");
+    location.reload();
+  };
+
+  /* ---------- botón ✏️ en cada fila ---------- */
+  function ponerBotones() {
+    document.querySelectorAll("#tablaEntradasBody tr").forEach(function (tr) {
+      var td = tr.querySelector("td:last-child");
+      if (!td || tr.querySelectorAll("td").length < 6 || td.querySelector(".btn-editar-ent")) return;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-editar-ent";
+      b.title = "Editar";
+      b.textContent = "✏️";
+      b.onclick = function (ev) { ev.stopPropagation(); abrir(tr); };
+      td.insertBefore(b, td.firstChild);
+    });
+  }
+  var cuerpo = $("tablaEntradasBody");
+  if (cuerpo) new MutationObserver(refrescar).observe(cuerpo, { childList: true });
+  /* ---------- cantidad que queda de cada entrada ----------
+     El stock actual del producto se reparte entre sus entradas: las más
+     antiguas se consumen primero. El historial guardado no se modifica. */
+  function aplicarRestante() {
+    var lista = leer(CLAVE) || [], ps = productos(), grupos = {};
+    [].slice.call(document.querySelectorAll("#tablaEntradasBody tr")).forEach(function (tr) {
+      var tds = tr.querySelectorAll("td");
+      if (tds.length < 6) return;
+      var idx = indiceDe(lista, tr), r = lista[idx];
+      if (!r || r.inventarioAplicado === false) return;
+      var p = buscarProd(ps, r.producto || r.nombre);
+      if (!p) return;
+      var n = num(r.cantidad), u = und(r.cantidad) || p.unidad, enProd = conv(n, u, p.unidad);
+      if (!(n > 0) || enProd === null) return;
+      if (tds[1].dataset.orig == null) tds[1].dataset.orig = tds[1].textContent;
+      var clave = norm(p.nombre || p.producto);
+      if (!grupos[clave]) grupos[clave] = { p: p, items: [] };
+      grupos[clave].items.push({ td: tds[1], idx: idx, r: r, u: u, enProd: enProd });
+    });
+    for (var k in grupos) {
+      var g = grupos[k], quedan = num(g.p.cantidad) || 0;
+      g.items.sort(function (a, b) {
+        var ka = a.r.fecha + " " + a.r.hora, kb = b.r.fecha + " " + b.r.hora;
+        return ka === kb ? a.idx - b.idx : (ka < kb ? 1 : -1);
+      });
+      g.items.forEach(function (it) {
+        var resto = Math.min(it.enProd, Math.max(0, quedan));
+        quedan -= resto;
+        var enU = conv(resto, g.p.unidad, it.u);
+        if (enU === null) return;
+        var html = esc(red(enU) + " " + it.u) +
+          (resto < it.enProd - 1e-9 ? '<small style="display:block;font-weight:400;font-size:11px;color:#94a3b8">entró ' + esc(it.td.dataset.orig) + '</small>' : "");
+        if (it.td.innerHTML !== html) it.td.innerHTML = html;
+      });
+    }
+  }
+  function refrescar() { ponerBotones(); aplicarRestante(); }
+  refrescar();
+  setInterval(refrescar, 2000);
+  window.addEventListener("focus", refrescar);
+  window.addEventListener("pageshow", refrescar);
+  window.addEventListener("storage", refrescar);
+
+  /* ---------- notificaciones de la campana ---------- */
+  function dias(texto) {
+    var t = String(texto || "").trim(), f = null, m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) f = new Date(+m[1], +m[2] - 1, +m[3]);
+    else { m = t.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/); if (m) f = new Date(+m[3], +m[2] - 1, +m[1]); }
+    if (!f || isNaN(f.getTime())) return null;
+    var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    return Math.round((f - hoy) / 86400000);
+  }
+  function minimo(p) {
+    var v = p.minimo != null ? p.minimo : p.stockMinimo, n = parseFloat(v);
+    return (v == null || v === "" || isNaN(n)) ? 5 : n;
+  }
+  function alertas() {
+    var out = [];
+    productos().forEach(function (p) {
+      var nombre = p.nombre || p.producto || "Producto";
+      if (Number(p.cantidad) <= minimo(p)) out.push({ t: "Stock bajo", d: nombre + ": " + p.cantidad + " " + (p.unidad || "") });
+      var d = dias(p.vencimiento);
+      if (d === null) return;
+      if (d < 0) out.push({ t: "Producto vencido", d: nombre + ": venció hace " + Math.abs(d) + " día(s)" });
+      else if (d === 0) out.push({ t: "Vence hoy", d: nombre + ": vence hoy" });
+      else if (d <= 7) out.push({ t: "Próximo a vencer", d: nombre + ": vence en " + d + " día(s)" });
+    });
+    return out;
+  }
+  function actualizarCampana() {
+    var lista = alertas(), n = lista.length;
+    var c = $("contadorAlertas"), t = $("textoAlertas"), cont = $("contenidoNotificaciones");
+    if (c) c.textContent = n;
+    if (t) t.textContent = n + (n === 1 ? " alerta" : " alertas");
+    if (cont) cont.innerHTML = n ? lista.map(function (a) {
+      return '<div style="padding:8px 0;border-bottom:1px solid #e2e8f0"><strong style="display:block;font-size:14px;color:#1e293b">' +
+        esc(a.t) + '</strong><span style="font-size:12px;color:#64748b">' + esc(a.d) + '</span></div>';
+    }).join("") : '<span style="font-size:12px;color:#64748b">No hay alertas.</span>';
+  }
+  window.addEventListener("focus", actualizarCampana);
+  window.addEventListener("pageshow", actualizarCampana);
+  window.addEventListener("storage", actualizarCampana);
+  setInterval(actualizarCampana, 2000);
+  actualizarCampana();
+})();
+
+  </script>
+
+  <!-- Funciones de la hamburguesa (van al final, después de script.js) -->
+  <script>
+    function hambAbrir() {
+      var menu = document.getElementById('menuInventario');
+      var fondo = document.getElementById('hambFondo');
+      if (!menu) return;
+      menu.classList.add('abierto');
+      menu.style.transform = 'translateX(0)';
+      menu.style.visibility = 'visible';
+      menu.setAttribute('aria-hidden', 'false');
+      if (fondo) fondo.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hambCerrar() {
+      var menu = document.getElementById('menuInventario');
+      var fondo = document.getElementById('hambFondo');
+      if (menu) {
+        menu.classList.remove('abierto');
+        menu.style.transform = 'translateX(-105%)';
+        menu.style.visibility = 'hidden';
+        menu.setAttribute('aria-hidden', 'true');
+      }
+      if (fondo) fondo.classList.remove('visible');
+      document.body.style.overflow = '';
+    }
+
+    function hambAlternar() {
+      var menu = document.getElementById('menuInventario');
+      if (menu && menu.classList.contains('abierto')) hambCerrar();
+      else hambAbrir();
+    }
+
+    function hambConfiguracion() {
+      hambCerrar();
+      if (typeof abrirConfiguracion === 'function') {
+        abrirConfiguracion();
+      } else {
+        alert('La configuración todavía no está disponible en esta página.');
+      }
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') hambCerrar();
+    });
+  </script>
+</body>
+</html>

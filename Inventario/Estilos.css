@@ -1,0 +1,332 @@
+:root {
+  --primary-coral: #e63928;
+  --primary-coral-hover: #c42b1c;
+  --bg-app: #ffffff;
+  --bg-page: #f4f6f9;
+  --text-dark: #1e232a;
+  --text-muted: #6c757d;
+  --border-color: #dcdfe4;
+  --font-family: 'Poppins', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-page);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.app-viewport {
+  width: 100%;
+  max-width: 500px;
+  height: 600px;
+  background-color: var(--bg-app);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-app);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px);
+  transition: all 0.3s ease-in-out;
+  padding: 20px 28px;
+}
+
+.screen.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.illustration-area {
+  height: 38%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: -20px -28px 12px -28px;
+  background: radial-gradient(circle at 50% 50%, rgba(230, 57, 40, 0.06) 0%, rgba(255, 255, 255, 0) 75%);
+}
+
+.network-dots-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle, #e63928 1.5px, transparent 1.5px),
+                    radial-gradient(circle, #1d4ed8 1.5px, transparent 1.5px);
+  background-size: 26px 26px, 38px 38px;
+  background-position: 0 0, 13px 13px;
+  opacity: 0.18;
+}
+
+.logo-wrapper {
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-logo {
+  width: 125px;
+  height: 125px;
+  object-fit: contain;
+}
+
+.screen-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow {
+  flex: 1;
+}
+
+.institution-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.2;
+}
+
+.institution-title small {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary-coral);
+  display: block;
+}
+
+.institution-title.small-title {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.institution-title.small-title small {
+  font-size: 0.85rem;
+}
+
+.headline {
+  color: var(--text-dark);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.subline {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+/* margin-top: auto desplaza los botones de bienvenida hasta la parte inferior */
+.split-button-box {
+  display: flex;
+  border: 1.5px solid var(--primary-coral);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: auto;
+  margin-bottom: 8px;
+}
+
+.btn-split {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: var(--primary-coral);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-split.highlight {
+  border-left: 1.5px solid var(--primary-coral);
+}
+
+.btn-split:hover {
+  background-color: rgba(230, 57, 40, 0.08);
+}
+
+.screen-header {
+  margin-bottom: 5px;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--primary-coral);
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 6px;
+  margin-left: -6px;
+}
+
+.auth-title {
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.auth-subtitle {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-bottom: 14px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-field label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  border-bottom: 1.5px solid var(--border-color);
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  background: transparent;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-field select {
+  cursor: pointer;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: var(--primary-coral);
+}
+
+/* Campo con botón de ojo para ver contraseña */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 32px;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.btn-toggle-password:hover {
+  opacity: 1;
+}
+
+.form-actions {
+  text-align: right;
+}
+
+.forgot-link {
+  color: var(--primary-coral);
+  font-size: 0.75rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Mueve el botón de formulario hacia abajo */
+.btn-primary {
+  width: 100%;
+  padding: 11px;
+  background-color: var(--primary-coral);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: auto;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-coral-hover);
+}
+
+.screen-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.screen-footer a {
+  color: var(--primary-coral);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.terms-link {
+  color: var(--text-muted) !important;
+  font-weight: 400 !important;
+}

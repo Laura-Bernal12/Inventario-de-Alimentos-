@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entradas y Menús</title>
+    <link href="./src3/output3.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.activo {
+            display: flex;
+        }
+        /* Estilos complementarios para el menú lateral y administrador */
+        .menu-lateral{
+            width:270px;
+            min-height:100vh;
+            background:#fff;
+            border-right:1px solid #dfe4e8;
+            position:fixed;
+            left:0;
+            top:0;
+            padding:20px 15px;
+            z-index:10000;
+            transform:translateX(-100%);
+            transition:.3s;
+            box-shadow:3px 0 15px rgba(0,0,0,.06);
+        }
+        .menu-lateral.menu-abierto{
+            transform:translateX(0);
+        }
+        .fondo-menu{
+            display:none;
+            position:fixed;
+            inset:0;
+            background:#0006;
+            z-index:9000;
+        }
+        .fondo-menu.fondo-visible{
+            display:block;
+        }
+        .menu-admin{
+            position:fixed;
+            top:85px;
+            right:25px;
+            width:220px;
+            background:#fff;
+            border:1px solid #ddd;
+            border-radius:10px;
+            box-shadow:0 8px 25px #0002;
+            z-index:30000;
+            overflow:hidden;
+        }
+        .menu-admin-header{
+            padding:12px 15px;
+            border-bottom:1px solid #eee;
+            background:#f8fafc;
+        }
+        .menu-admin-header strong{
+            display:block;
+            font-size:13px;
+            color:#174ea6;
+        }
+        .menu-admin-header span{
+            display:block;
+            font-size:12px;
+            color:#777;
+            margin-top:3px;
+        }
+        .menu-admin button{
+            width:100%;
+            padding:13px 15px;
+            border:0;
+            background:#fff;
+            text-align:left;
+            font-size:14px;
+            cursor:pointer;
+        }
+        .menu-admin button:hover{
+            background:#f2f5f8;
+        }
+        .oculto{display:none!important}
+    </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen text-slate-900">
+
+    <div id="fondoMenu" class="fondo-menu"></div>
+
+    <!-- =====================================================
+         ENCABEZADO ORIGINAL + HAMBURGUESA DEL INVENTARIO
+    ====================================================== -->
+
+    <header class="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-40 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+
+            <!-- HAMBURGUESA -->
+            <div class="relative inline-block">
+                <button
+                    onclick="toggleMenuInventario()"
+                    class="w-11 h-11 rounded-lg bg-purple-100 text-purple-700 text-2xl flex items-center justify-center hover:bg-purple-200 transition" style="background-color:#f3e8ff;color:#7e22ce;">
+                    ☰
+                </button>
+
+                <!-- MENÚ DESPLEGABLE LATERAL -->
+                <div
+                    id="menuInventario"
+                    class="hidden absolute left-0 top-12 mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+
+                    <!-- LOGO DEL INSTITUTO Y CORREO DE SESIÓN ACTIVA -->
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center">
+                                <img src="./img/logo-instituto.jpg" alt="Logo del Instituto" class="w-full h-full object-contain">
+                            </div>
+                            <div class="overflow-hidden">
+                                <h1 class="font-bold text-gray-800">Inventario</h1>
+                                <p id="dropUserCorreo" class="text-xs text-gray-500 truncate">admin@instituto.com</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="alimentos.html" onclick="cerrarMenuInventario()" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 transition">🏠 <span>Panel de Control</span></a>
+                    <a href="catalogo.html" onclick="cerrarMenuInventario()" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 transition">📦 <span>Catálogo</span></a>
+                    <a href="entradas.html" onclick="cerrarMenuInventario()" class="flex items-center gap-3 px-4 py-3 bg-purple-100 text-purple-700 font-semibold">🍽️ <span>Menú</span></a>
+                    <a href="indext.html" onclick="cerrarMenuInventario()" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 transition">⬆️ <span>Entradas</span></a>
+                   <a href="Index1.html" onclick="cerrarMenuInventario()" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 transition">⬇️ <span>Salidas</span></a>
+
+                    <button type="button" onclick="cerrarMenuInventario(); if (typeof abrirConfiguracion === 'function') { abrirConfiguracion(); } else { alert('La configuración todavía no está disponible en esta página.'); }" class="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 transition text-left">⚙️ <span>Configuración</span></button>
+
+                    <div class="border-t border-gray-200">
+                        <button type="button" onclick="cerrarMenuInventario(); cerrarSesionGeneral();" class="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 transition text-left">🚪 <span>Cerrar sesión</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">Entradas y Menús</h2>
+                <p class="text-xs text-gray-500">Registro de alimentación e inventario de alimentos</p>
+            </div>
+            
+        </div>
+
+        <!-- SECCIÓN DE USUARIO / ADMIN EN LA CABECERA -->
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-white overflow-hidden" id="fotoUsuario">👤</div>
+            <button id="btnAdmin" class="flex items-center gap-2 font-bold text-slate-700 bg-transparent border-0 cursor-pointer">
+                <span id="navUserNombre">Admin</span>
+                <span class="text-lg">⌄</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MENU ADMIN DESPLEGABLE -->
+    <div id="menuAdmin" class="menu-admin oculto">
+        <div class="menu-admin-header">
+            <strong id="dropUserNombreModal">Admin</strong>
+            <span id="dropUserCorreoModal">admin@instituto.com</span>
+            <span id="dropUserRolModal">Administrador</span>
+        </div>
+        <button id="miCuenta">👤 Mi cuenta</button>
+        <button id="agregarCuenta">👤 Agregar cuenta</button>
+        <button id="cambiarCuenta">🔄 Cambiar cuenta</button>
+        <button id="salirAdmin">🚪 Cerrar sesión</button>
+    </div>
+
+    <!-- MODAL CUENTA -->
+    <div id="modalCuenta" class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+            <button id="cerrarCuenta" class="absolute top-4 right-4 text-2xl text-slate-500">×</button>
+            <h2 id="tituloModalCuenta" class="text-2xl font-bold mb-4">Agregar cuenta</h2>
+            <div id="contenidoCuenta"></div>
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         CONTENIDO
+    ====================================================== -->
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+
+        <h2 class="text-3xl font-bold text-slate-900">
+            Registro de entradas
+        </h2>
+
+        <p class="text-slate-500 mt-2">
+            Seleccione el menú y registre la cantidad de estudiantes que asistieron.
+        </p>
+
+
+        <!-- =================================================
+             BUSCADOR ORIGINAL
+        ================================================= -->
+
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-8">
+
+            <div class="flex items-start gap-4">
+
+                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold shrink-0">
+                    1
+                </div>
+
+                <div class="flex-1">
+
+                    <h3 class="text-xl font-bold">
+                        Buscar menú
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Escriba el nombre del menú que desea consultar.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="flex gap-3 mt-5">
+
+                <input
+                    type="text"
+                    id="buscarMenu"
+                    placeholder="Ejemplo: pupusas, casamiento, cereal..."
+                    onkeyup="buscarMenus()"
+                    class="flex-1 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500">
+
+                <button
+                    onclick="buscarMenus()"
+                    class="bg-emerald-600 text-white px-8 rounded-xl font-bold hover:bg-emerald-700">
+                    Buscar
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MENÚS DISPONIBLES
+        ================================================== -->
+
+        <div class="flex justify-between items-center mt-7 mb-4">
+
+            <h2 class="text-xl font-bold">
+                Menús disponibles
+            </h2>
+
+            <button
+                onclick="abrirAgregarMenu()"
+                class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-emerald-700">
+
+                + Agregar menú
+
+            </button>
+
+        </div>
+
+
+        <section
+            id="listaMenus"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        </section>
+
+
+        <!-- =================================================
+             SECCIÓN DE CÁLCULO
+        ================================================== -->
+
+        <section
+            id="seccionCalculo"
+            class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-8">
+
+            <div class="flex justify-between items-center">
+
+                <div>
+
+                    <h2 class="text-2xl font-bold">
+                        Registro del menú
+                    </h2>
+
+                    <p
+                        id="nombreMenuSeleccionado"
+                        class="text-emerald-700 font-semibold mt-1">
+                    </p>
+
+                </div>
+
+                <button
+                    onclick="cerrarCalculo()"
+                    class="bg-slate-200 px-4 py-2 rounded-lg">
+                    Cerrar
+                </button>
+
+            </div>
+
+
+            <div class="grid md:grid-cols-3 gap-4 mt-6">
+
+                <div class="bg-slate-50 rounded-xl p-4">
+
+                    <p class="text-sm text-slate-500">
+                        Fecha del menú
+                    </p>
+
+                    <p
+                        id="fechaMenuSeleccionado"
+                        class="font-bold mt-1">
+                    </p>
+
+                </div>
+
+
+                <div class="bg-slate-50 rounded-xl p-4">
+
+                    <p class="text-sm text-slate-500">
+                        Raciones de referencia
+                    </p>
+
+                    <p
+                        id="racionesReferencia"
+                        class="font-bold mt-1">
+                    </p>
+
+                </div>
+
+
+                <div class="bg-slate-50 rounded-xl p-4">
+
+                    <p class="text-sm text-slate-500">
+                        Fecha y hora actual
+                    </p>
+
+                    <p
+                        id="fechaHoraActual"
+                        class="font-bold mt-1">
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ESTUDIANTES -->
+
+            <div class="mt-6">
+
+                <label class="font-bold">
+                    ¿Cuántos estudiantes asistieron ese día?
+                </label>
+
+                <input
+                    type="number"
+                    id="estudiantes"
+                    min="1"
+                    placeholder="Escriba la cantidad de estudiantes"
+                    class="w-full md:w-1/2 mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500">
+
+            </div>
+
+
+            <button
+                onclick="calcularRaciones()"
+                class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold mt-5 hover:bg-emerald-700">
+
+                Calcular raciones
+
+            </button>
+
+
+            <!-- RESULTADO -->
+
+            <div
+                id="resultado"
+                class="hidden mt-7">
+
+                <div class="grid md:grid-cols-3 gap-4">
+
+                    <div class="bg-blue-50 rounded-xl p-5">
+
+                        <p class="text-sm text-slate-500">
+                            Estudiantes
+                        </p>
+
+                        <p
+                            id="totalEstudiantes"
+                            class="text-2xl font-bold text-blue-700">
+                        </p>
+
+                    </div>
+
+
+                    <div class="bg-emerald-50 rounded-xl p-5">
+
+                        <p class="text-sm text-slate-500">
+                            Porciones a preparar
+                        </p>
+
+                        <p
+                            id="porcionesPreparar"
+                            class="text-2xl font-bold text-emerald-700">
+                        </p>
+
+                    </div>
+
+
+                    <div class="bg-purple-50 rounded-xl p-5">
+
+                        <p class="text-sm text-slate-500">
+                            Porciones a entregar
+                        </p>
+
+                        <p
+                            id="porcionesEntregar"
+                            class="text-2xl font-bold text-purple-700">
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RACIÓN INDIVIDUAL -->
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mt-5">
+
+                    <h3 class="font-bold text-yellow-800">
+                        Ración que recibe cada estudiante
+                    </h3>
+
+                    <p class="text-sm text-slate-600 mt-1">
+                        Aquí se muestra cuánto corresponde de cada alimento
+                        a un estudiante.
+                    </p>
+
+                </div>
+
+
+                <!-- TABLA -->
+
+                <div class="overflow-x-auto mt-6">
+
+                    <table class="w-full border-collapse">
+
+                        <thead>
+
+                            <tr class="bg-slate-800 text-white">
+
+                                <th class="border px-4 py-3">
+                                    No.
+                                </th>
+
+                                <th class="border px-4 py-3 text-left">
+                                    Alimento
+                                </th>
+
+                                <th class="border px-4 py-3 text-left">
+                                    Cantidad de referencia
+                                </th>
+
+                                <th class="border px-4 py-3 text-left">
+                                    Ración por estudiante
+                                </th>
+
+                                <th class="border px-4 py-3 text-left">
+                                    Porciones
+                                </th>
+
+                                <th class="border px-4 py-3 text-left">
+                                    Cantidad total necesaria
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="tablaAlimentos">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- FECHA Y HORA DEL REGISTRO -->
+
+                <div class="grid md:grid-cols-2 gap-4 mt-6">
+
+                    <div class="bg-slate-50 rounded-xl p-4">
+
+                        <p class="text-sm text-slate-500">
+                            Fecha del registro
+                        </p>
+
+                        <p
+                            id="fechaRegistro"
+                            class="font-bold">
+                        </p>
+
+                    </div>
+
+
+                    <div class="bg-slate-50 rounded-xl p-4">
+
+                        <p class="text-sm text-slate-500">
+                            Hora del registro
+                        </p>
+
+                        <p
+                            id="horaRegistro"
+                            class="font-bold">
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex gap-3 mt-6">
+
+                    <button
+                        onclick="guardarRegistro()"
+                        class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700">
+
+                        Guardar registro
+
+                    </button>
+
+
+                    <button
+                        onclick="mostrarRegistros()"
+                        class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700">
+
+                        Ver registros
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             HISTORIAL
+        ================================================== -->
+
+        <section
+            id="historial"
+            class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-8">
+
+            <div class="flex justify-between items-center">
+
+                <div>
+
+                    <h2 class="text-2xl font-bold">
+                        Registros guardados
+                    </h2>
+
+                    <p class="text-slate-500">
+                        Aquí puedes consultar lo que se dio cada día.
+                    </p>
+
+                </div>
+
+                <button
+                    onclick="cerrarHistorial()"
+                    class="bg-slate-200 px-4 py-2 rounded-lg">
+                    Cerrar
+                </button>
+
+            </div>
+
+
+            <div
+                id="listaRegistros"
+                class="mt-6">
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         MODAL AGREGAR / EDITAR
+    ====================================================== -->
+
+    <div
+        id="modalMenu"
+        class="modal fixed inset-0 bg-black/50 items-center justify-center p-4 z-50">
+
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+
+            <div class="p-6 border-b">
+
+                <div class="flex justify-between items-center">
+
+                    <h2
+                        id="tituloModal"
+                        class="text-2xl font-bold">
+                        Agregar menú
+                    </h2>
+
+                    <button
+                        onclick="cerrarModal()"
+                        class="text-2xl text-slate-500">
+                        ×
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="p-6">
+
+                <input
+                    type="hidden"
+                    id="indiceEditar">
+
+
+                <label class="font-bold">
+                    Nombre del menú
+                </label>
+
+                <input
+                    id="nuevoNombre"
+                    type="text"
+                    placeholder="Ejemplo: Pupusas de arroz con frijoles y bebida"
+                    class="w-full border border-slate-300 rounded-xl px-4 py-3 mt-2 mb-5">
+
+
+                <label class="font-bold">
+                    Fecha del menú
+                </label>
+
+                <input
+                    id="nuevaFecha"
+                    type="date"
+                    class="w-full border border-slate-300 rounded-xl px-4 py-3 mt-2 mb-5">
+
+
+                <label class="font-bold">
+                    Raciones de referencia
+                </label>
+
+                <input
+                    id="nuevasRaciones"
+                    type="number"
+                    min="1"
+                    placeholder="Ejemplo: 197"
+                    class="w-full border border-slate-300 rounded-xl px-4 py-3 mt-2 mb-5">
+
+
+                <div class="flex justify-between items-center mb-3">
+
+                    <label class="font-bold">
+                        Alimentos
+                    </label>
+
+                    <button
+                        onclick="agregarAlimento()"
+                        class="bg-emerald-600 text-white px-4 py-2 rounded-lg">
+                        + Agregar alimento
+                    </button>
+
+                </div>
+
+
+                <div id="listaAlimentosModal">
+                </div>
+
+
+                <div class="flex justify-end gap-3 mt-6 pt-5 border-t">
+
+                    <button
+                        onclick="cerrarModal()"
+                        class="bg-slate-200 px-5 py-3 rounded-xl font-bold">
+                        Cancelar
+                    </button>
+
+                    <button
+                        onclick="guardarMenu()"
+                        class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold">
+                        Guardar menú
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        /* =====================================================
+             GESTIÓN DE CUENTAS / ADMINISTRADOR
+        ====================================================== */
+        let cuentas = [];
+        try {
+            cuentas = JSON.parse(localStorage.getItem("cuentasInventario")) || [];
+        } catch(error) {
+            cuentas = [];
+        }
+
+        let cuentaActivaId = localStorage.getItem("cuentaActivaInventario");
+        let cuentaEditandoId = null;
+        let fotoTemporal = "";
+
+        if(cuentas.length === 0) {
+            const cuentaInicial = {
+                id: Date.now().toString(),
+                nombre: "Admin",
+                correo: "admin@instituto.com",
+                rol: "Administrador",
+                foto: ""
+            };
+            cuentas.push(cuentaInicial);
+            cuentaActivaId = cuentaInicial.id;
+            guardarCuentas();
+        }
+
+        if(!cuentaActivaId || !cuentas.some(cuenta => cuenta.id === cuentaActivaId)) {
+            cuentaActivaId = cuentas[0].id;
+            guardarCuentas();
+        }
+
+        function guardarCuentas(){
+            localStorage.setItem("cuentasInventario", JSON.stringify(cuentas));
+            localStorage.setItem("cuentaActivaInventario", cuentaActivaId);
+        }
+
+        function obtenerCuentaActiva(){
+            return cuentas.find(cuenta => cuenta.id === cuentaActivaId);
+        }
+
+        function actualizarPerfil(){
+            const cuenta = obtenerCuentaActiva();
+            if(!cuenta) return;
+            if(document.getElementById("navUserNombre")) document.getElementById("navUserNombre").textContent = cuenta.nombre;
+            if(document.getElementById("dropUserNombreModal")) document.getElementById("dropUserNombreModal").textContent = cuenta.nombre;
+            if(document.getElementById("dropUserCorreo")) document.getElementById("dropUserCorreo").textContent = cuenta.correo;
+            if(document.getElementById("dropUserCorreoModal")) document.getElementById("dropUserCorreoModal").textContent = cuenta.correo;
+            if(document.getElementById("dropUserRolModal")) document.getElementById("dropUserRolModal").textContent = cuenta.rol;
+            const foto = document.getElementById("fotoUsuario");
+            if(foto){
+                if(cuenta.foto){
+                    foto.innerHTML = `<img src="${cuenta.foto}" alt="Foto" style="width:100%;height:100%;object-fit:cover;">`;
+                } else {
+                    foto.innerHTML = "👤";
+                }
+            }
+        }
+
+        function abrirMiCuenta(){
+            const cuenta = obtenerCuentaActiva();
+            if(!cuenta) return;
+            cuentaEditandoId = cuenta.id;
+            fotoTemporal = cuenta.foto || "";
+            document.getElementById("tituloModalCuenta").textContent = "Mi cuenta";
+            document.getElementById("contenidoCuenta").innerHTML = `
+                <div style="width:100px;height:100px;border-radius:50%;background:#174ea6;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;overflow:hidden;" id="previewFoto">
+                ${cuenta.foto ? `<img src="${cuenta.foto}" style="width:100%;height:100%;object-fit:cover;">` : "👤"}
+                </div>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Nombre</label>
+                <input id="nombreCuenta" type="text" value="${escapeHTML(cuenta.nombre)}" style="width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;" required>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Correo electrónico</label>
+                <input id="correoCuenta" type="email" value="${escapeHTML(cuenta.correo)}" style="width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;" required>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Rol</label>
+                <select id="rolCuenta" style="width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;">
+                    <option value="Administrador" ${cuenta.rol==="Administrador"?"selected":""}>Administrador</option>
+                    <option value="Encargado de inventario" ${cuenta.rol==="Encargado de inventario"?"selected":""}>Encargado de inventario</option>
+                    <option value="Consulta" ${cuenta.rol==="Consulta"?"selected":""}>Consulta</option>
+                </select>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Foto de perfil</label>
+                <input id="fotoCuenta" type="file" accept="image/*" style="width:100%;margin-bottom:10px;">
+                <button id="guardarPerfil" class="bg-emerald-600 text-white w-full py-3 rounded-xl font-bold mt-2">Guardar cambios</button>
+                <button id="eliminarCuentaBtn" class="bg-red-100 text-red-700 w-full py-3 rounded-xl font-bold mt-2">Eliminar cuenta</button>
+            `;
+            document.getElementById("fotoCuenta").addEventListener("change", previsualizarFoto);
+            document.getElementById("guardarPerfil").onclick = guardarCuenta;
+            document.getElementById("eliminarCuentaBtn").onclick = eliminarCuenta;
+            document.getElementById("modalCuenta").classList.add("activo");
+        }
+
+        function abrirModalAgregarCuenta(){
+            cuentaEditandoId = null;
+            fotoTemporal = "";
+            document.getElementById("tituloModalCuenta").textContent = "Agregar cuenta";
+            document.getElementById("contenidoCuenta").innerHTML = `
+                <div style="width:100px;height:100px;border-radius:50%;background:#174ea6;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;overflow:hidden;" id="previewFoto">👤</div>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Nombre</label>
+                <input id="nombreCuenta" type="text" placeholder="Nombre completo" style="width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;" required>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Correo electrónico</label>
+                <input id="correoCuenta" type="email" placeholder="correo@instituto.com" style="width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;" required>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Rol</label>
+                <select id="rolCuenta" style="width:100%;height:42px;border:1px solid #cfd5da;border-radius:7px;padding:8px 10px;">
+                    <option value="Administrador">Administrador</option>
+                    <option value="Encargado de inventario">Encargado de inventario</option>
+                    <option value="Consulta">Consulta</option>
+                </select>
+                <label style="display:block;margin:12px 0 6px;font-weight:bold;font-size:14px;">Foto de perfil</label>
+                <input id="fotoCuenta" type="file" accept="image/*" style="width:100%;margin-bottom:10px;">
+                <button id="guardarNuevaCuenta" class="bg-emerald-600 text-white w-full py-3 rounded-xl font-bold mt-2">Crear cuenta</button>
+            `;
+            document.getElementById("fotoCuenta").addEventListener("change", previsualizarFoto);
+            document.getElementById("guardarNuevaCuenta").onclick = guardarCuenta;
+            document.getElementById("modalCuenta").classList.add("activo");
+        }
+
+        function previsualizarFoto(event){
+            const archivo = event.target.files[0];
+            if(!archivo) return;
+            const lector = new FileReader();
+            lector.onload = function(e){
+                fotoTemporal = e.target.result;
+                const preview = document.getElementById("previewFoto");
+                if(preview) preview.innerHTML = `<img src="${fotoTemporal}" style="width:100%;height:100%;object-fit:cover;">`;
+            };
+            lector.readAsDataURL(archivo);
+        }
+
+        function guardarCuenta(){
+            const nombre = document.getElementById("nombreCuenta").value.trim();
+            const correo = document.getElementById("correoCuenta").value.trim();
+            const rol = document.getElementById("rolCuenta").value;
+            if(!nombre){ alert("Ingrese el nombre."); return; }
+            if(!correo){ alert("Ingrese el correo electrónico."); return; }
+            if(!correo.includes("@")){ alert("Ingrese un correo electrónico válido."); return; }
+
+            if(cuentaEditandoId){
+                const cuenta = cuentas.find(c => c.id === cuentaEditandoId);
+                if(cuenta){
+                    cuenta.nombre = nombre;
+                    cuenta.correo = correo;
+                    cuenta.rol = rol;
+                    cuenta.foto = fotoTemporal || "";
+                }
+            } else {
+                const nuevaCuenta = {
+                    id: Date.now().toString(),
+                    nombre: nombre,
+                    correo: correo,
+                    rol: rol,
+                    foto: fotoTemporal || ""
+                };
+                cuentas.push(nuevaCuenta);
+                cuentaActivaId = nuevaCuenta.id;
+            }
+
+            guardarCuentas();
+            actualizarPerfil();
+            document.getElementById("modalCuenta").classList.remove("activo");
+            alert("✅ Cuenta guardada correctamente.");
+        }
+
+        function abrirModalCambiarCuenta(){
+            document.getElementById("tituloModalCuenta").textContent = "Cambiar cuenta";
+            let contenido = `<p style="margin-bottom:10px;">Selecciona la cuenta que deseas utilizar:</p>`;
+            cuentas.forEach(function(cuenta){
+                contenido += `
+                    <button style="width:100%;padding:12px;margin-top:8px;border:1px solid #ddd;border-radius:7px;background:#fff;text-align:left;cursor:pointer;" onclick="cambiarCuenta('${cuenta.id}')">
+                        👤 <strong>${escapeHTML(cuenta.nombre)}</strong><br>
+                        <small style="color:#777;">${escapeHTML(cuenta.correo)}</small>
+                    </button>
+                `;
+            });
+            contenido += `<button class="bg-emerald-600 text-white w-full py-3 rounded-xl font-bold mt-4" onclick="abrirModalAgregarCuenta()">＋ Agregar cuenta</button>`;
+            document.getElementById("contenidoCuenta").innerHTML = contenido;
+            document.getElementById("modalCuenta").classList.add("activo");
+        }
+
+        function cambiarCuenta(id){
+            const cuenta = cuentas.find(c => c.id === id);
+            if(!cuenta) return;
+            cuentaActivaId = cuenta.id;
+            guardarCuentas();
+            actualizarPerfil();
+            document.getElementById("modalCuenta").classList.remove("activo");
+            alert("✅ Cuenta cambiada correctamente.");
+        }
+
+        function eliminarCuenta(){
+            const cuenta = obtenerCuentaActiva();
+            if(!cuenta) return;
+            if(cuentas.length <= 1){ alert("No puedes eliminar la única cuenta."); return; }
+            const confirmar = confirm("¿Deseas eliminar la cuenta de " + cuenta.nombre + "?");
+            if(!confirmar) return;
+            cuentas = cuentas.filter(c => c.id !== cuenta.id);
+            cuentaActivaId = cuentas[0].id;
+            guardarCuentas();
+            actualizarPerfil();
+            document.getElementById("modalCuenta").classList.remove("activo");
+            alert("🗑️ Cuenta eliminada correctamente.");
+        }
+
+        function escapeHTML(text){
+            return String(text)
+                .replace(/&/g,"&amp;")
+                .replace(/</g,"&lt;")
+                .replace(/>/g,"&gt;")
+                .replace(/"/g,"&quot;")
+                .replace(/'/g,"&#039;");
+        }
+
+
+        /* =====================================================
+             MENÚS ORIGINALES
+        ====================================================== */
+
+        const menusIniciales = [
+            {
+                id: "menu1",
+                nombre: "Pupusas de arroz con frijoles y bebida",
+                fecha: "02/02/2026",
+                racionesBase: 197,
+                alimentos: [
+                    { nombre: "Arroz", cantidad: 3.74, unidad: "lb" },
+                    { nombre: "Aceite", cantidad: 4.68, unidad: "L" },
+                    { nombre: "Frijoles", cantidad: 2.81, unidad: "lb" },
+                    { nombre: "Bebida", cantidad: 197, unidad: "porciones" }
+                ]
+            },
+            {
+                id: "menu2",
+                nombre: "Casamiento y bebida",
+                fecha: "03/02/2026",
+                racionesBase: 202,
+                alimentos: [
+                    { nombre: "Arroz", cantidad: 3.03, unidad: "lb" },
+                    { nombre: "Frijoles", cantidad: 4.04, unidad: "lb" },
+                    { nombre: "Aceite", cantidad: 1.62, unidad: "L" },
+                    { nombre: "Bebida", cantidad: 202, unidad: "porciones" }
+                ]
+            },
+            {
+                id: "menu3",
+                nombre: "Arroz con leche",
+                fecha: "04/02/2026",
+                racionesBase: 198,
+                alimentos: [
+                    { nombre: "Arroz", cantidad: 4.95, unidad: "lb" },
+                    { nombre: "Leche", cantidad: 4.95, unidad: "L" },
+                    { nombre: "Azúcar", cantidad: 2.97, unidad: "lb" }
+                ]
+            },
+            {
+                id: "menu4",
+                nombre: "Ensalada de frijoles con arroz, vegetales y bebida",
+                fecha: "05/02/2026",
+                racionesBase: 205,
+                alimentos: [
+                    { nombre: "Frijoles", cantidad: 3.08, unidad: "lb" },
+                    { nombre: "Arroz", cantidad: 3.08, unidad: "lb" },
+                    { nombre: "Vegetales", cantidad: 2, unidad: "lb" },
+                    { nombre: "Bebida", cantidad: 205, unidad: "porciones" }
+                ]
+            },
+            {
+                id: "menu5",
+                nombre: "Cereal con leche",
+                fecha: "06/02/2026",
+                racionesBase: 187,
+                alimentos: [
+                    { nombre: "Cereal", cantidad: 5.91, unidad: "lb" },
+                    { nombre: "Leche", cantidad: 5.91, unidad: "L" }
+                ]
+            },
+            {
+                id: "menu6",
+                nombre: "Frijoles molidos y bebida",
+                fecha: "09/02/2026",
+                racionesBase: 212,
+                alimentos: [
+                    { nombre: "Frijoles", cantidad: 5.30, unidad: "lb" },
+                    { nombre: "Aceite", cantidad: 3.18, unidad: "L" },
+                    { nombre: "Bebida", cantidad: 212, unidad: "porciones" }
+                ]
+            }
+        ];
+
+
+        /* =====================================================
+             CARGAR MENÚS GUARDADOS
+        ====================================================== */
+
+        let menus = JSON.parse(localStorage.getItem("menusAlimentacion"));
+
+        if (!menus) {
+            menus = menusIniciales.map(menu => ({
+                ...menu,
+                fechaAgregado: null,
+                horaAgregado: null,
+                fechaModificado: null,
+                horaModificado: null
+            }));
+            guardarMenus();
+        }
+
+        let menuSeleccionado = null;
+
+        let registroGuardado = false;
+
+
+        /* =====================================================
+             GUARDAR MENÚS
+        ====================================================== */
+
+        function guardarMenus() {
+            localStorage.setItem("menusAlimentacion", JSON.stringify(menus));
+        }
+
+
+        /* =====================================================
+             FECHA Y HORA
+        ====================================================== */
+
+        function obtenerFechaHora() {
+            const ahora = new Date();
+            return {
+                fecha: ahora.toLocaleDateString("es-SV", { day: "2-digit", month: "2-digit", year: "numeric" }),
+                hora: ahora.toLocaleTimeString("es-SV", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+            };
+        }
+
+        function fechaParaSalidas() {
+            const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+            const ahora = new Date();
+            return String(ahora.getDate()).padStart(2, "0") + " " + meses[ahora.getMonth()] + " " + ahora.getFullYear();
+        }
+
+
+        /* =====================================================
+             INVENTARIO
+        ====================================================== */
+
+        const UNIDADES_MENU = {
+            lb: { nombres: ["lb", "lbs", "libra", "libras"], tipo: "peso", factor: 453.592 },
+            kg: { nombres: ["kg", "kgs", "kilo", "kilos", "kilogramo", "kilogramos"], tipo: "peso", factor: 1000 },
+            g: { nombres: ["g", "gr", "gramo", "gramos"], tipo: "peso", factor: 1 },
+            l: { nombres: ["l", "lt", "lts", "litro", "litros"], tipo: "volumen", factor: 1000 },
+            ml: { nombres: ["ml", "mililitro", "mililitros"], tipo: "volumen", factor: 1 },
+            un: { nombres: ["un", "pza", "pzas", "pieza", "piezas", "unidad", "unidades", "ud", "uds", "porcion", "porciones"], tipo: "unidad", factor: 1 }
+        };
+
+        function normalizarNombre(valor) {
+            return String(valor ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+        }
+
+        function numeroDe(valor) {
+            if (typeof valor === "number") return valor;
+            const coincidencia = String(valor ?? "").replace(/,/g, ".").match(/[0-9]+(?:\.[0-9]+)?/);
+            return coincidencia ? Number(coincidencia[0]) : NaN;
+        }
+
+        function claveUnidad(unidad) {
+            const u = normalizarNombre(unidad).replace(/\./g, "");
+            for (const clave in UNIDADES_MENU) {
+                if (UNIDADES_MENU[clave].nombres.includes(u)) return clave;
+            }
+            return u;
+        }
+
+        function convertirUnidad(cantidad, deUnidad, aUnidad) {
+            const de = claveUnidad(deUnidad);
+            const a = claveUnidad(aUnidad);
+            if (!de || !a || de === a) return cantidad;
+            const origen = UNIDADES_MENU[de];
+            const destino = UNIDADES_MENU[a];
+            if (!origen || !destino || origen.tipo !== destino.tipo) return null;
+            return cantidad * origen.factor / destino.factor;
+        }
+
+        function leerInventario() {
+            const claves = ["productosInventario", "productos", "inventarioEscolar"];
+            let primeraVacia = null;
+            for (const clave of claves) {
+                try {
+                    const valor = JSON.parse(localStorage.getItem(clave) || "null");
+                    if (Array.isArray(valor)) {
+                        if (valor.length > 0) return valor;
+                        if (!primeraVacia) primeraVacia = valor;
+                    }
+                } catch (error) {}
+            }
+            return primeraVacia || [];
+        }
+
+        function guardarInventario(lista) {
+            const texto = JSON.stringify(lista);
+            localStorage.setItem("productosInventario", texto);
+            localStorage.setItem("productos", texto);
+            localStorage.setItem("inventarioEscolar", texto);
+        }
+
+        function buscarEnInventario(lista, nombre) {
+            const buscado = normalizarNombre(nombre);
+            if (!buscado) return undefined;
+            const nombreDe = p => normalizarNombre(p.nombre ?? p.producto ?? p.nombreProducto);
+            const exacto = lista.find(p => nombreDe(p) === buscado);
+            if (exacto) return exacto;
+            const parecidos = lista.filter(p => {
+                const n = nombreDe(p);
+                return n && (n.startsWith(buscado + " ") || buscado.startsWith(n + " "));
+            });
+            return parecidos.length === 1 ? parecidos[0] : undefined;
+        }
+
+        function cantidadDeProducto(producto) {
+            const numero = numeroDe(producto.cantidad ?? producto.existencia ?? producto.stock ?? 0);
+            return Number.isFinite(numero) ? numero : 0;
+        }
+
+        function redondearCantidad(numero) {
+            return Number(Number(numero).toFixed(3));
+        }
+
+        function verificarInventarioMenu(alimentos) {
+            const lista = leerInventario();
+            const faltan = [];
+            const insuficientes = [];
+            const necesario = new Map();
+
+            alimentos.forEach(alimento => {
+                const total = Number(alimento.total.toFixed(2));
+                if (!(total > 0)) return;
+                const producto = buscarEnInventario(lista, alimento.nombre);
+                if (!producto) {
+                    if (!faltan.includes(alimento.nombre)) faltan.push(alimento.nombre);
+                    return;
+                }
+                const unidadInventario = producto.unidad || "";
+                const enInventario = convertirUnidad(total, alimento.unidad, unidadInventario || alimento.unidad);
+                if (enInventario === null) {
+                    insuficientes.push(alimento.nombre + ": la unidad del menú (" + alimento.unidad + ") no se puede comparar con la del inventario (" + unidadInventario + ")");
+                    return;
+                }
+                necesario.set(producto, (necesario.get(producto) || 0) + enInventario);
+            });
+
+            necesario.forEach((cantidad, producto) => {
+                const disponible = cantidadDeProducto(producto);
+                if (cantidad > disponible + 1e-9) {
+                    const unidad = producto.unidad ? " " + producto.unidad : "";
+                    insuficientes.push((producto.nombre ?? "Producto") + ": se necesitan " + redondearCantidad(cantidad) + unidad + " y solo hay " + redondearCantidad(disponible) + unidad);
+                }
+            });
+
+            return { faltan, insuficientes };
+        }
+
+        function descontarInventarioMenu(alimentos, responsable, fecha, hora) {
+            const lista = leerInventario();
+            const filas = [];
+
+            alimentos.forEach(alimento => {
+                const total = Number(alimento.total.toFixed(2));
+                if (!(total > 0)) return;
+                const producto = buscarEnInventario(lista, alimento.nombre);
+                if (!producto) return;
+                const unidadInventario = producto.unidad || "";
+                const enInventario = convertirUnidad(total, alimento.unidad, unidadInventario || alimento.unidad);
+                producto.cantidad = Math.max(0, redondearCantidad(cantidadDeProducto(producto) - enInventario));
+                filas.push({
+                    id: Date.now() + Math.random(),
+                    producto: producto.nombre ?? alimento.nombre,
+                    cantidad: total.toFixed(2) + " " + alimento.unidad,
+                    fecha: fecha,
+                    hora: hora,
+                    destino: "Cocina Escolar",
+                    responsable: responsable,
+                    inventarioAplicado: true
+                });
+            });
+
+            guardarInventario(lista);
+            return filas;
+        }
+
+
+        /* =====================================================
+             MOSTRAR MENÚS
+        ====================================================== */
+
+        function mostrarMenus(lista) {
+            const contenedor = document.getElementById("listaMenus");
+            contenedor.innerHTML = "";
+
+            if (lista.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl p-8 text-center">
+                        No se encontraron menús.
+                    </div>
+                `;
+                return;
+            }
+
+            lista.forEach(menu => {
+                const tarjeta = document.createElement("div");
+                tarjeta.className = "bg-white rounded-2xl border border-slate-200 shadow-sm p-6";
+
+                let informacionFecha = "";
+
+                if (menu.fechaAgregado) {
+                    informacionFecha += `
+                        <p class="text-xs text-slate-400 mt-3">
+                            Agregado: ${menu.fechaAgregado} ${menu.horaAgregado}
+                        </p>
+                    `;
+                }
+
+                if (menu.fechaModificado) {
+                    informacionFecha += `
+                        <p class="text-xs text-orange-500 mt-1">
+                            Modificado: ${menu.fechaModificado} ${menu.horaModificado}
+                        </p>
+                    `;
+                }
+
+                tarjeta.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-slate-500">Fecha</p>
+                            <p class="font-semibold text-blue-900">${menu.fecha}</p>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            Menú
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg font-bold mt-6">${menu.nombre}</h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Receta de referencia: ${menu.racionesBase} raciones
+                    </p>
+
+                    ${informacionFecha}
+
+                    <button onclick="seleccionarMenu('${menu.id}')" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold mt-5 hover:bg-emerald-700">
+                        Seleccionar menú
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <button onclick="editarMenu('${menu.id}')" class="bg-yellow-100 text-yellow-700 py-2 rounded-lg font-semibold hover:bg-yellow-200">
+                            ✏️ Editar
+                        </button>
+                        <button onclick="eliminarMenu('${menu.id}')" class="bg-red-100 text-red-700 py-2 rounded-lg font-semibold hover:bg-red-200">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                `;
+
+                contenedor.appendChild(tarjeta);
+            });
+        }
+
+
+        /* =====================================================
+             BUSCAR
+        ====================================================== */
+
+        function buscarMenus() {
+            const texto = document.getElementById("buscarMenu").value.toLowerCase().trim();
+            const resultados = menus.filter(menu => menu.nombre.toLowerCase().includes(texto));
+            mostrarMenus(resultados);
+        }
+
+
+        /* =====================================================
+             AGREGAR MENÚ
+        ====================================================== */
+
+        function abrirAgregarMenu() {
+            document.getElementById("tituloModal").textContent = "Agregar menú";
+            document.getElementById("indiceEditar").value = "";
+            document.getElementById("nuevoNombre").value = "";
+            document.getElementById("nuevaFecha").value = "";
+            document.getElementById("nuevasRaciones").value = "";
+            document.getElementById("listaAlimentosModal").innerHTML = "";
+
+            agregarAlimento();
+
+            document.getElementById("modalMenu").classList.add("activo");
+        }
+
+
+        /* =====================================================
+             AGREGAR ALIMENTO AL FORMULARIO
+        ====================================================== */
+
+        function agregarAlimento(nombre = "", cantidad = "", unidad = "") {
+            const contenedor = document.getElementById("listaAlimentosModal");
+            const fila = document.createElement("div");
+
+            fila.className = "grid grid-cols-1 md:grid-cols-4 gap-2 mb-3";
+            fila.innerHTML = `
+                <input class="nombreAlimento border border-slate-300 rounded-lg px-3 py-2" placeholder="Alimento" value="${nombre}">
+                <input class="cantidadAlimento border border-slate-300 rounded-lg px-3 py-2" type="number" step="0.01" placeholder="Cantidad" value="${cantidad}">
+                <input class="unidadAlimento border border-slate-300 rounded-lg px-3 py-2" placeholder="Unidad" value="${unidad}">
+                <button type="button" onclick="this.parentElement.remove()" class="bg-red-100 text-red-700 rounded-lg py-2 font-semibold">
+                    🗑️ Quitar
+                </button>
+            `;
+
+            contenedor.appendChild(fila);
+        }
+
+
+        /* =====================================================
+             GUARDAR NUEVO / EDITAR
+        ====================================================== */
+
+        function guardarMenu() {
+            const nombre = document.getElementById("nuevoNombre").value.trim();
+            const fechaInput = document.getElementById("nuevaFecha").value;
+            const raciones = parseInt(document.getElementById("nuevasRaciones").value);
+
+            if (!nombre) { alert("Escribe el nombre del menú."); return; }
+            if (!fechaInput) { alert("Selecciona la fecha del menú."); return; }
+            if (!raciones || raciones <= 0) { alert("Escribe las raciones de referencia."); return; }
+
+            const nombres = document.querySelectorAll(".nombreAlimento");
+            const cantidades = document.querySelectorAll(".cantidadAlimento");
+            const unidades = document.querySelectorAll(".unidadAlimento");
+
+            const alimentos = [];
+
+            for (let i = 0; i < nombres.length; i++) {
+                if (nombres[i].value.trim() && cantidades[i].value && unidades[i].value.trim()) {
+                    alimentos.push({
+                        nombre: nombres[i].value.trim(),
+                        cantidad: parseFloat(cantidades[i].value),
+                        unidad: unidades[i].value.trim()
+                    });
+                }
+            }
+
+            if (alimentos.length === 0) {
+                alert("Agrega por lo menos un alimento.");
+                return;
+            }
+
+            const partes = fechaInput.split("-");
+            const fecha = `${partes[2]}/${partes[1]}/${partes[0]}`;
+            const fechaHora = obtenerFechaHora();
+            const indice = document.getElementById("indiceEditar").value;
+
+            /* EDITAR */
+            if (indice !== "") {
+                const posicion = parseInt(indice);
+                menus[posicion].nombre = nombre;
+                menus[posicion].fecha = fecha;
+                menus[posicion].racionesBase = raciones;
+                menus[posicion].alimentos = alimentos;
+                menus[posicion].fechaModificado = fechaHora.fecha;
+                menus[posicion].horaModificado = fechaHora.hora;
+
+                alert("✅ Menú actualizado correctamente.");
+            }
+            /* AGREGAR */
+            else {
+                menus.push({
+                    id: "menu-" + Date.now(),
+                    nombre: nombre,
+                    fecha: fecha,
+                    racionesBase: raciones,
+                    alimentos: alimentos,
+                    fechaAgregado: fechaHora.fecha,
+                    horaAgregado: fechaHora.hora,
+                    fechaModificado: null,
+                    horaModificado: null
+                });
+
+                alert("✅ Menú agregado correctamente.\n\nFecha: " + fechaHora.fecha + "\nHora: " + fechaHora.hora);
+            }
+
+            guardarMenus();
+            mostrarMenus(menus);
+            cerrarModal();
+        }
+
+
+        /* =====================================================
+             EDITAR MENÚ
+        ====================================================== */
+
+        function editarMenu(id) {
+            const indice = menus.findIndex(menu => menu.id === id);
+            if (indice === -1) return;
+
+            const menu = menus[indice];
+            document.getElementById("tituloModal").textContent = "Editar menú";
+            document.getElementById("indiceEditar").value = indice;
+            document.getElementById("nuevoNombre").value = menu.nombre;
+
+            const partes = menu.fecha.split("/");
+            document.getElementById("nuevaFecha").value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+            document.getElementById("nuevasRaciones").value = menu.racionesBase;
+            document.getElementById("listaAlimentosModal").innerHTML = "";
+
+            menu.alimentos.forEach(alimento => {
+                agregarAlimento(alimento.nombre, alimento.cantidad, alimento.unidad);
+            });
+
+            document.getElementById("modalMenu").classList.add("activo");
+        }
+
+
+        /* =====================================================
+             ELIMINAR MENÚ
+        ====================================================== */
+
+        function eliminarMenu(id) {
+            const indice = menus.findIndex(menu => menu.id === id);
+            if (indice === -1) return;
+
+            const confirmar = confirm("¿Seguro que deseas eliminar este menú?");
+            if (!confirmar) return;
+
+            menus.splice(indice, 1);
+            guardarMenus();
+            mostrarMenus(menus);
+
+            alert("🗑️ Menú eliminado correctamente.");
+        }
+
+
+        /* =====================================================
+             CERRAR MODAL
+        ====================================================== */
+
+        function cerrarModal() {
+            document.getElementById("modalMenu").classList.remove("activo");
+        }
+
+
+        /* =====================================================
+             SELECCIONAR MENÚ
+        ====================================================== */
+
+        function seleccionarMenu(id) {
+            menuSeleccionado = menus.find(menu => menu.id === id);
+            if (!menuSeleccionado) return;
+
+            document.getElementById("seccionCalculo").classList.remove("hidden");
+            document.getElementById("historial").classList.add("hidden");
+            document.getElementById("nombreMenuSeleccionado").textContent = menuSeleccionado.nombre;
+            document.getElementById("fechaMenuSeleccionado").textContent = menuSeleccionado.fecha;
+            document.getElementById("racionesReferencia").textContent = menuSeleccionado.racionesBase;
+
+            actualizarFechaHora();
+
+            window.scrollTo({
+                top: document.getElementById("seccionCalculo").offsetTop - 20,
+                behavior: "smooth"
+            });
+        }
+
+
+        /* =====================================================
+             FECHA Y HORA ACTUAL
+        ====================================================== */
+
+        function actualizarFechaHora() {
+            const datos = obtenerFechaHora();
+            document.getElementById("fechaHoraActual").textContent = datos.fecha + " " + datos.hora;
+        }
+
+
+        /* =====================================================
+             CALCULAR RACIONES
+        ====================================================== */
+
+        function calcularRaciones() {
+            if (!menuSeleccionado) {
+                alert("Selecciona un menú.");
+                return;
+            }
+
+            const estudiantes = parseInt(document.getElementById("estudiantes").value);
+
+            if (!estudiantes || estudiantes <= 0) {
+                alert("Escribe una cantidad válida de estudiantes.");
+                return;
+            }
+
+            registroGuardado = false;
+
+            document.getElementById("totalEstudiantes").textContent = estudiantes;
+            document.getElementById("porcionesPreparar").textContent = estudiantes;
+            document.getElementById("porcionesEntregar").textContent = estudiantes;
+
+            const tabla = document.getElementById("tablaAlimentos");
+            tabla.innerHTML = "";
+
+            menuSeleccionado.alimentos.forEach((alimento, indice) => {
+                const racionIndividual = alimento.cantidad / menuSeleccionado.racionesBase;
+                const total = racionIndividual * estudiantes;
+
+                tabla.innerHTML += `
+                    <tr>
+                        <td class="border px-4 py-3">${indice + 1}</td>
+                        <td class="border px-4 py-3 font-semibold">${alimento.nombre}</td>
+                        <td class="border px-4 py-3">${alimento.cantidad.toFixed(2)} ${alimento.unidad}</td>
+                        <td class="border px-4 py-3 text-emerald-700 font-bold">${racionIndividual.toFixed(3)} ${alimento.unidad}</td>
+                        <td class="border px-4 py-3">${estudiantes}</td>
+                        <td class="border px-4 py-3 font-bold">${total.toFixed(2)} ${alimento.unidad}</td>
+                    </tr>
+                `;
+            });
+
+            const datos = obtenerFechaHora();
+            document.getElementById("fechaRegistro").textContent = datos.fecha;
+            document.getElementById("horaRegistro").textContent = datos.hora;
+            document.getElementById("resultado").classList.remove("hidden");
+        }
+
+
+        /* =====================================================
+             GUARDAR REGISTRO (CONEXIÓN AUTOMÁTICA A SALIDAS)
+        ====================================================== */
+
+        function guardarRegistro() {
+            if (!menuSeleccionado) {
+                alert("Selecciona un menú.");
+                return;
+            }
+
+            const estudiantes = parseInt(document.getElementById("estudiantes").value);
+
+            if (!estudiantes) {
+                alert("Escribe primero la cantidad de estudiantes.");
+                return;
+            }
+
+            if (registroGuardado) {
+                alert("Este registro ya fue guardado. Calcula las raciones de nuevo para hacer otro.");
+                return;
+            }
+
+            const datos = obtenerFechaHora();
+
+            const alimentos = menuSeleccionado.alimentos.map(alimento => {
+                const racion = alimento.cantidad / menuSeleccionado.racionesBase;
+                return {
+                    nombre: alimento.nombre,
+                    unidad: alimento.unidad,
+                    racionIndividual: racion,
+                    total: racion * estudiantes
+                };
+            });
+
+            const revision = verificarInventarioMenu(alimentos);
+
+            if (revision.faltan.length > 0 || revision.insuficientes.length > 0) {
+                let mensaje = "⚠️ No se guardó el registro y no salió nada del inventario.";
+
+                if (revision.faltan.length > 0) {
+                    mensaje += "\n\nEstos alimentos no están registrados en el inventario:\n" +
+                        revision.faltan.map(nombre => "• " + nombre).join("\n") +
+                        "\n\nRegístralos primero en el Catálogo o en Entradas.";
+                }
+
+                if (revision.insuficientes.length > 0) {
+                    mensaje += "\n\nNo alcanza el inventario:\n" +
+                        revision.insuficientes.map(texto => "• " + texto).join("\n");
+                }
+
+                alert(mensaje);
+                return;
+            }
+
+            let nombreResponsable = "Admin";
+            try {
+                let cuentasLocales = JSON.parse(localStorage.getItem("cuentasInventario")) || [];
+                let idActiva = localStorage.getItem("cuentaActivaInventario");
+                let cuentaEncontrada = cuentasLocales.find(c => c.id === idActiva);
+                if (cuentaEncontrada) {
+                    nombreResponsable = cuentaEncontrada.nombre;
+                }
+            } catch (e) {
+                nombreResponsable = "Admin";
+            }
+
+            const clavesRespaldo = ["productosInventario", "productos", "inventarioEscolar", "salidasTableData", "registrosAlimentacion"];
+            const respaldo = clavesRespaldo.map(clave => [clave, localStorage.getItem(clave)]);
+
+            try {
+                const filas = descontarInventarioMenu(alimentos, nombreResponsable, fechaParaSalidas(), datos.hora);
+
+                const salidasInventario = JSON.parse(localStorage.getItem("salidasTableData")) || [];
+                localStorage.setItem("salidasTableData", JSON.stringify(salidasInventario.concat(filas)));
+
+                const registros = JSON.parse(localStorage.getItem("registrosAlimentacion")) || [];
+
+                registros.push({
+                    id: Date.now(),
+                    menu: menuSeleccionado.nombre,
+                    fechaMenu: menuSeleccionado.fecha,
+                    fechaRegistro: datos.fecha,
+                    horaRegistro: datos.hora,
+                    estudiantes: estudiantes,
+                    alimentos: alimentos
+                });
+
+                localStorage.setItem("registrosAlimentacion", JSON.stringify(registros));
+            } catch (error) {
+                respaldo.forEach(([clave, valor]) => {
+                    if (valor === null) localStorage.removeItem(clave);
+                    else localStorage.setItem(clave, valor);
+                });
+                console.error(error);
+                alert("No se pudo guardar el registro. No se descontó nada del inventario.");
+                return;
+            }
+
+            registroGuardado = true;
+
+            alert("✅ Registro guardado. Los alimentos se descontaron del inventario y quedaron en Salidas.\n\nFecha: " + datos.fecha + "\nHora: " + datos.hora);
+        }
+
+
+        /* =====================================================
+             MOSTRAR HISTORIAL
+        ====================================================== */
+
+        function mostrarRegistros() {
+            const historial = document.getElementById("historial");
+            const lista = document.getElementById("listaRegistros");
+            const registros = JSON.parse(localStorage.getItem("registrosAlimentacion")) || [];
+
+            historial.classList.remove("hidden");
+            lista.innerHTML = "";
+
+            if (registros.length === 0) {
+                lista.innerHTML = `
+                    <div class="text-center text-slate-500 py-8">
+                        No hay registros guardados todavía.
+                    </div>
+                `;
+                return;
+            }
+
+            registros.slice().reverse().forEach(registro => {
+                let filas = "";
+
+                registro.alimentos.forEach((alimento, indice) => {
+                    filas += `
+                        <tr>
+                            <td class="border px-3 py-2">${indice + 1}</td>
+                            <td class="border px-3 py-2">${alimento.nombre}</td>
+                            <td class="border px-3 py-2">${alimento.racionIndividual.toFixed(3)} ${alimento.unidad}</td>
+                            <td class="border px-3 py-2 font-bold">${alimento.total.toFixed(2)} ${alimento.unidad}</td>
+                        </tr>
+                    `;
+                });
+
+                lista.innerHTML += `
+                    <div class="border border-slate-200 rounded-xl p-5 mb-5">
+                        <h3 class="text-xl font-bold text-emerald-700">${registro.menu}</h3>
+
+                        <div class="grid md:grid-cols-3 gap-3 mt-3 text-sm">
+                            <p>📅 Menú: <strong>${registro.fechaMenu}</strong></p>
+                            <p>🗓️ Registro: <strong>${registro.fechaRegistro}</strong></p>
+                            <p>🕐 Hora: <strong>${registro.horaRegistro}</strong></p>
+                        </div>
+
+                        <p class="mt-3">👩‍🎓 Estudiantes: <strong>${registro.estudiantes}</strong></p>
+
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100">
+                                        <th class="border px-3 py-2">No.</th>
+                                        <th class="border px-3 py-2 text-left">Alimento</th>
+                                        <th class="border px-3 py-2 text-left">Ración individual</th>
+                                        <th class="border px-3 py-2 text-left">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filas}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button onclick="eliminarRegistro(${registro.id})" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg mt-4 font-semibold">
+                            🗑️ Eliminar registro
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+
+        /* =====================================================
+             ELIMINAR REGISTRO
+        ====================================================== */
+
+        function eliminarRegistro(id) {
+            if (!confirm("¿Seguro que deseas eliminar este registro?")) return;
+
+            let registros = JSON.parse(localStorage.getItem("registrosAlimentacion")) || [];
+            registros = registros.filter(registro => registro.id !== id);
+
+            localStorage.setItem("registrosAlimentacion", JSON.stringify(registros));
+            mostrarRegistros();
+        }
+
+
+        /* =====================================================
+             CERRAR HISTORIAL Y CÁLCULO
+        ====================================================== */
+
+        function cerrarHistorial() {
+            document.getElementById("historial").classList.add("hidden");
+        }
+
+        function cerrarCalculo() {
+            document.getElementById("seccionCalculo").classList.add("hidden");
+        }
+
+
+        /* =====================================================
+             HAMBURGUESA DEL INVENTARIO
+        ====================================================== */
+
+        function toggleMenuInventario() {
+            const menu = document.getElementById("menuInventario");
+            if (menu) menu.classList.toggle("hidden");
+        }
+
+        function cerrarMenuInventario() {
+            const menu = document.getElementById("menuInventario");
+            if (menu) menu.classList.add("hidden");
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") cerrarMenuInventario();
+        });
+
+
+        /* =====================================================
+             EVENTOS DE ADMINISTRADOR Y PERFIL
+        ====================================================== */
+
+        document.getElementById("btnAdmin").onclick = e => {
+            e.stopPropagation();
+            document.getElementById("menuAdmin").classList.toggle("oculto");
+        };
+
+        document.getElementById("miCuenta").onclick = () => { document.getElementById("menuAdmin").classList.add("oculto"); abrirMiCuenta(); };
+        document.getElementById("agregarCuenta").onclick = () => { document.getElementById("menuAdmin").classList.add("oculto"); abrirModalAgregarCuenta(); };
+        document.getElementById("cerrarCuenta").onclick = () => { document.getElementById("modalCuenta").classList.remove("activo"); };
+        document.getElementById("cambiarCuenta").onclick = () => { document.getElementById("menuAdmin").classList.add("oculto"); abrirModalCambiarCuenta(); };
+        document.getElementById("salirAdmin").onclick = () => { document.getElementById("menuAdmin").classList.add("oculto"); alert("Sesión cerrada."); };
+        
+        function cerrarSesionGeneral() {
+            alert("Sesión cerrada correctamente.");
+        }
+
+        document.onclick = e => {
+            if(!e.target.closest("#btnAdmin") && !e.target.closest("#menuAdmin")) {
+                const menuAdmin = document.getElementById("menuAdmin");
+                if(menuAdmin) menuAdmin.classList.add("oculto");
+            }
+        };
+
+
+        /* =====================================================
+             INICIAR
+        ====================================================== */
+
+        actualizarPerfil();
+        mostrarMenus(menus);
+
+    </script>
+
+</body>
+</html>
